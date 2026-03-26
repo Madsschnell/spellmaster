@@ -1,0 +1,45 @@
+#pragma once
+#include "Player.hpp"
+#include "Spell.hpp"
+#include "InputProvider.hpp"
+#include <iostream>
+#include <string>
+#include <memory>
+
+// Vores State Machine
+enum class GameState
+{
+    STARTING,
+    INPUT_PHASE,
+    CALCULATING,
+    BROADCASTING,
+    GAME_OVER
+};
+
+class GameMaster
+{
+private:
+    GameState currentState;
+    Player player1;
+    Player player2;
+    int roundNumber;
+
+    // Input provider - kan være ConsoleInputProvider eller netværksbaseret
+    std::unique_ptr<InputProvider> inputProvider;
+
+    // Midlertidige variabler til at gemme terminal-input
+    int p1Input;
+    int p2Input;
+
+    // Valgte spells til denne runde
+    Spell p1Spell;
+    Spell p2Spell;
+
+    // Hjælpefunktion til at konvertere input til Spell
+    Spell inputToSpell(int input);
+
+public:
+    GameMaster();
+    explicit GameMaster(std::unique_ptr<InputProvider> provider);
+    void run(); // Selve spil-loopet
+};
