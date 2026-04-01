@@ -7,6 +7,7 @@ private:
     std::string name;
     int hp;
     int mana;
+    bool shieldUp = false;
 
 public:
     // Constructor til at bygge spilleren
@@ -22,4 +23,6 @@ public:
     void heal(int amount);
     void spendMana(int amount);
     bool isAlive() const;
+    void setShield(bool active); // activere/deactivere
+    bool activeShield() const;   // tjekker tilstand
 };

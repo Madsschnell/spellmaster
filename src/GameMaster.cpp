@@ -86,6 +86,13 @@ void GameMaster::run()
                     player1.spendMana(p1Spell.manaCost);
                 }
 
+                // shield
+                if (p1CanCast && p1Spell.type == SpellType::Shield)
+                {
+                    player1.setShield(true);
+                    std::cout << player1.getName() << " aktiverer sit skjold!" << std::endl;
+                }
+
                 // Anvend effekt
                 if (p1Spell.damage > 0)
                 {
@@ -93,6 +100,7 @@ void GameMaster::run()
                     std::cout << player1.getName() << " kaster " << p1Spell.name
                               << " på " << player2.getName() << " for " << p1Spell.damage << " skade!" << std::endl;
                 }
+
                 // heal
                 else if (p1Spell.healAmount > 0)
                 {
@@ -115,6 +123,13 @@ void GameMaster::run()
                     player2.spendMana(p2Spell.manaCost);
                 }
 
+                // shield
+                if (p2CanCast && p2Spell.type == SpellType::Shield)
+                {
+                    player2.setShield(true);
+                    std::cout << player2.getName() << " aktiverer sit skjold!" << std::endl;
+                }
+
                 // Anvend effekt
                 if (p2Spell.damage > 0)
                 {
@@ -122,6 +137,7 @@ void GameMaster::run()
                     std::cout << player2.getName() << " kaster " << p2Spell.name
                               << " på " << player1.getName() << " for " << p2Spell.damage << " skade!" << std::endl;
                 }
+
                 else if (p2Spell.healAmount > 0)
                 {
                     player2.heal(p2Spell.healAmount);

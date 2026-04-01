@@ -1,4 +1,5 @@
 #include "Player.hpp"
+#include <iostream>
 
 // Initialiserer spilleren med de værdier, GameMasteren giver os
 Player::Player(std::string playerName, int startingHp, int startingMana)
@@ -19,8 +20,26 @@ int Player::getMana() const
     return mana;
 }
 
+void Player::setShield(bool active)
+{
+    shieldUp = active;
+}
+
+bool Player::activeShield() const
+{
+    return shieldUp;
+}
+
 void Player::takeDamage(int amount)
 {
+
+    if (shieldUp)
+    {
+        std::cout << name << "blokerede angreb med shield" << std::endl;
+        shieldUp = false;
+        return;
+    }
+
     hp -= amount;
     if (hp < 0)
     {
