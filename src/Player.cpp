@@ -32,7 +32,10 @@ void Player::heal(int amount)
 {
     hp += amount;
 
-    // Kan tilføje at man ikke kan gå over sit start liv
+    if (hp > 100)
+    {
+        hp = 100; // sørger for man ikke kan få mere liv end man startede med
+    }
 }
 
 void Player::spendMana(int amount)
