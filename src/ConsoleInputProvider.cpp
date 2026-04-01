@@ -11,7 +11,7 @@ void ConsoleInputProvider::shutdown()
     // Ingen oprydning nødvendig for console input
 }
 
-int ConsoleInputProvider::getSpellInput(const std::string& playerName)
+int ConsoleInputProvider::getSpellInput(const std::string &playerName)
 {
     int input;
     std::cout << "Indtast spell for " << playerName << ": ";

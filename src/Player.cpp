@@ -28,6 +28,13 @@ void Player::takeDamage(int amount)
     }
 }
 
+void Player::heal(int amount)
+{
+    hp += amount;
+
+    // Kan tilføje at man ikke kan gå over sit start liv
+}
+
 void Player::spendMana(int amount)
 {
     mana -= amount;

@@ -19,6 +19,7 @@ public:
 
     // Funktioner til at ændre tilstanden
     void takeDamage(int amount);
+    void heal(int amount);
     void spendMana(int amount);
     bool isAlive() const;
 };

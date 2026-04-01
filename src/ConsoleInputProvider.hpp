@@ -8,5 +8,5 @@ class ConsoleInputProvider : public InputProvider
 public:
     void initialize() override;
     void shutdown() override;
-    int getSpellInput(const std::string& playerName) override;
+    int getSpellInput(const std::string &playerName) override;
 };

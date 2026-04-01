@@ -93,10 +93,12 @@ void GameMaster::run()
                     std::cout << player1.getName() << " kaster " << p1Spell.name
                               << " på " << player2.getName() << " for " << p1Spell.damage << " skade!" << std::endl;
                 }
+                // heal
                 else if (p1Spell.healAmount > 0)
                 {
-                    // Heal logic (ikke implementeret i Player endnu)
-                    std::cout << player1.getName() << " kaster " << p1Spell.name << "!" << std::endl;
+                    player1.heal(p1Spell.healAmount);
+                    std::cout << player1.getName() << " kaster " << p1Spell.name
+                              << " og healer sig selv for " << p1Spell.healAmount << " HP!" << std::endl;
                 }
             }
             else if (!p1CanCast && p1Spell.type != SpellType::Miss)
@@ -122,25 +124,26 @@ void GameMaster::run()
                 }
                 else if (p2Spell.healAmount > 0)
                 {
-                    std::cout << player2.getName() << " kaster " << p2Spell.name << "!" << std::endl;
+                    player2.heal(p2Spell.healAmount);
+                    std::cout << player2.getName() << " kaster " << p2Spell.name
+                              << " og healer sig selv for " << p2Spell.healAmount << " HP!" << std::endl;
                 }
-            }
-            else if (!p2CanCast && p2Spell.type != SpellType::Miss)
-            {
-                std::cout << player2.getName() << " har ikke nok mana til " << p2Spell.name << "!" << std::endl;
-            }
+                else if (!p2CanCast && p2Spell.type != SpellType::Miss)
+                {
+                    std::cout << player2.getName() << " har ikke nok mana til " << p2Spell.name << "!" << std::endl;
+                }
 
-            // Tjek win condition
-            if (player1.getHp() <= 0 || player2.getHp() <= 0)
-            {
-                currentState = GameState::GAME_OVER;
+                // Tjek win condition
+                if (player1.getHp() <= 0 || player2.getHp() <= 0)
+                {
+                    currentState = GameState::GAME_OVER;
+                }
+                else
+                {
+                    currentState = GameState::BROADCASTING;
+                }
+                break;
             }
-            else
-            {
-                currentState = GameState::BROADCASTING;
-            }
-            break;
-        }
 
         case GameState::BROADCASTING:
             std::cout << "\nStatus efter runde " << roundNumber << ":" << std::endl;
@@ -163,5 +166,5 @@ void GameMaster::run()
             isRunning = false;
             break;
         }
+        }
     }
-}
