@@ -52,6 +52,7 @@ private:
 public:
     GameMaster();
     explicit GameMaster(std::unique_ptr<InputProvider> provider);
+    ~GameMaster();
     void run(); // Selve spil-loopet
 
     // Genererer en JSON-repræsentation af spillets tilstand til BROADCASTING

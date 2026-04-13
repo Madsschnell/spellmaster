@@ -2,6 +2,12 @@
 #include "ConsoleInputProvider.hpp"
 #include <fstream>
 
+GameMaster::~GameMaster()
+{
+    zmqPublisher.close();
+    zmqContext.close();
+}
+
 GameMaster::GameMaster()
     : zmqContext(1),
       zmqPublisher(zmqContext, zmq::socket_type::pub),
@@ -15,7 +21,9 @@ GameMaster::GameMaster()
       p2Spell(Spell::Miss()),
       inputProvider(std::make_unique<ConsoleInputProvider>())
 {
-    zmqPublisher.bind("tcp://*:5555"); // Åbner port 5555 til broadcasting
+    int linger = 0;
+    zmqPublisher.set(zmq::sockopt::linger, linger); // Luk socket øjeblikkeligt uden at vente
+    zmqPublisher.bind("tcp://*:5555");              // Åbner port 5555 til broadcasting
     loadSpells("spells.json");
 }
 
@@ -32,6 +40,8 @@ GameMaster::GameMaster(std::unique_ptr<InputProvider> provider)
       p2Spell(Spell::Miss()),
       inputProvider(std::move(provider))
 {
+    int linger = 0;
+    zmqPublisher.set(zmq::sockopt::linger, linger); // Luk socket øjeblikkeligt uden at vente
     zmqPublisher.bind("tcp://*:5555");
     loadSpells("spells.json");
 }
@@ -88,6 +98,7 @@ void GameMaster::run()
     bool isRunning = true;
 
     std::cout << "--- Velkommen til Spellmaster GameMaster ---" << std::endl;
+    inputProvider->initialize(); // Initialisér input provider (åbner netværksforbindelser om nødvendigt)
 
     while (isRunning)
     {
@@ -220,6 +231,7 @@ void GameMaster::run()
             else
                 std::cout << "Det blev uafgjort!" << std::endl;
 
+            inputProvider->shutdown(); // Ryd op efter input provider (lukker netværksforbindelser)
             isRunning = false;
             break;
         } // Slut på switch
@@ -233,14 +245,22 @@ nlohmann::json GameMaster::getGameStateJson() const
     j["roundNumber"] = roundNumber;
 
     j["player1"] = {
+        {"name", player1.getName()},
         {"hp", player1.getHp()},
         {"mana", player1.getMana()},
-        {"shieldActive", player1.activeShield()}};
+        {"shieldActive", player1.activeShield()},
+        {"lastSpell", p1Spell.name},
+        {"lastSpellDamage", p1Spell.damage},
+        {"lastSpellHeal", p1Spell.healAmount}};
 
     j["player2"] = {
+        {"name", player2.getName()},
         {"hp", player2.getHp()},
         {"mana", player2.getMana()},
-        {"shieldActive", player2.activeShield()}};
+        {"shieldActive", player2.activeShield()},
+        {"lastSpell", p2Spell.name},
+        {"lastSpellDamage", p2Spell.damage},
+        {"lastSpellHeal", p2Spell.healAmount}};
 
     return j;
 }
