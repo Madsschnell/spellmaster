@@ -112,148 +112,119 @@ void GameMaster::run()
             break;
 
         case GameState::INPUT_PHASE:
-            // Bruger InputProvider - kan være console eller netværk
             p1Input = inputProvider->getSpellInput(player1.getName());
             p2Input = inputProvider->getSpellInput(player2.getName());
 
-            // Konverter input til Spell objekter
             p1Spell = inputToSpell(p1Input);
             p2Spell = inputToSpell(p2Input);
 
             currentState = GameState::CALCULATING;
             break;
-        }
 
-    case GameState::CALCULATING:
-    {
-        std::cout << "Beregner..." << std::endl;
+        case GameState::CALCULATING:
+        { // <--- Scope starter her
+            std::cout << "Beregner..." << std::endl;
 
-        // Tjek om spillerne har nok mana til deres valgte spells
-        bool p1CanCast = (p1Spell.manaCost == 0) || (player1.getMana() >= p1Spell.manaCost);
-        bool p2CanCast = (p2Spell.manaCost == 0) || (player2.getMana() >= p2Spell.manaCost);
+            bool p1CanCast = (p1Spell.manaCost == 0) || (player1.getMana() >= p1Spell.manaCost);
+            bool p2CanCast = (p2Spell.manaCost == 0) || (player2.getMana() >= p2Spell.manaCost);
 
-        // Håndter Player 1's spell
-        if (p1CanCast && p1Spell.type != SpellType::Miss)
+            // ... logik for P1 ...
+            if (p1CanCast && p1Spell.type != SpellType::Miss)
+            {
+                if (p1Spell.manaCost > 0)
+                    player1.spendMana(p1Spell.manaCost);
+                if (p1Spell.type == SpellType::Shield)
+                {
+                    player1.setShield(true);
+                    std::cout << player1.getName() << " aktiverer sit skjold!" << std::endl;
+                }
+                if (p1Spell.damage > 0)
+                {
+                    player2.takeDamage(p1Spell.damage);
+                    std::cout << player1.getName() << " kaster " << p1Spell.name << " på " << player2.getName() << " for " << p1Spell.damage << " skade!" << std::endl;
+                }
+                else if (p1Spell.healAmount > 0)
+                {
+                    player1.heal(p1Spell.healAmount);
+                    std::cout << player1.getName() << " kaster " << p1Spell.name << " og healer sig selv for " << p1Spell.healAmount << " HP!" << std::endl;
+                }
+            }
+            else if (!p1CanCast && p1Spell.type != SpellType::Miss)
+            {
+                std::cout << player1.getName() << " har ikke nok mana til " << p1Spell.name << "!" << std::endl;
+            }
+
+            // ... logik for P2 ...
+            if (p2CanCast && p2Spell.type != SpellType::Miss)
+            {
+                if (p2Spell.manaCost > 0)
+                    player2.spendMana(p2Spell.manaCost);
+                if (p2Spell.type == SpellType::Shield)
+                {
+                    player2.setShield(true);
+                    std::cout << player2.getName() << " aktiverer sit skjold!" << std::endl;
+                }
+                if (p2Spell.damage > 0)
+                {
+                    player1.takeDamage(p2Spell.damage);
+                    std::cout << player2.getName() << " kaster " << p2Spell.name << " på " << player1.getName() << " for " << p2Spell.damage << " skade!" << std::endl;
+                }
+                else if (p2Spell.healAmount > 0)
+                {
+                    player2.heal(p2Spell.healAmount);
+                    std::cout << player2.getName() << " kaster " << p2Spell.name << " og healer sig selv for " << p2Spell.healAmount << " HP!" << std::endl;
+                }
+            }
+            else if (!p2CanCast && p2Spell.type != SpellType::Miss)
+            {
+                std::cout << player2.getName() << " har ikke nok mana til " << p2Spell.name << "!" << std::endl;
+            }
+
+            if (player1.getHp() <= 0 || player2.getHp() <= 0)
+            {
+                currentState = GameState::GAME_OVER;
+            }
+            else
+            {
+                currentState = GameState::BROADCASTING;
+            }
+        } // <--- HER var din manglende parentes!
+        break;
+
+        case GameState::BROADCASTING:
         {
-            // Brug mana
-            if (p1Spell.manaCost > 0)
-            {
-                player1.spendMana(p1Spell.manaCost);
-            }
+            std::cout << "\nStatus efter runde " << roundNumber << ":" << std::endl;
+            std::cout << player1.getName() << " - HP: " << player1.getHp() << ", Mana: " << player1.getMana() << std::endl;
+            std::cout << player2.getName() << " - HP: " << player2.getHp() << ", Mana: " << player2.getMana() << std::endl;
 
-            // shield
-            if (p1CanCast && p1Spell.type == SpellType::Shield)
-            {
-                player1.setShield(true);
-                std::cout << player1.getName() << " aktiverer sit skjold!" << std::endl;
-            }
-
-            // Anvend effekt
-            if (p1Spell.damage > 0)
-            {
-                player2.takeDamage(p1Spell.damage);
-                std::cout << player1.getName() << " kaster " << p1Spell.name
-                          << " på " << player2.getName() << " for " << p1Spell.damage << " skade!" << std::endl;
-            }
-
-            // heal
-            else if (p1Spell.healAmount > 0)
-            {
-                player1.heal(p1Spell.healAmount);
-                std::cout << player1.getName() << " kaster " << p1Spell.name
-                          << " og healer sig selv for " << p1Spell.healAmount << " HP!" << std::endl;
-            }
-        }
-        else if (!p1CanCast && p1Spell.type != SpellType::Miss)
-        {
-            std::cout << player1.getName() << " har ikke nok mana til " << p1Spell.name << "!" << std::endl;
-        }
-
-        // Håndter Player 2's spell
-        if (p2CanCast && p2Spell.type != SpellType::Miss)
-        {
-            // Brug mana
-            if (p2Spell.manaCost > 0)
-            {
-                player2.spendMana(p2Spell.manaCost);
-            }
-
-            // shield
-            if (p2CanCast && p2Spell.type == SpellType::Shield)
-            {
-                player2.setShield(true);
-                std::cout << player2.getName() << " aktiverer sit skjold!" << std::endl;
-            }
-
-            // Anvend effekt
-            if (p2Spell.damage > 0)
-            {
-                player1.takeDamage(p2Spell.damage);
-                std::cout << player2.getName() << " kaster " << p2Spell.name
-                          << " på " << player1.getName() << " for " << p2Spell.damage << " skade!" << std::endl;
-            }
-
-            else if (p2Spell.healAmount > 0)
-            {
-                player2.heal(p2Spell.healAmount);
-                std::cout << player2.getName() << " kaster " << p2Spell.name
-                          << " og healer sig selv for " << p2Spell.healAmount << " HP!" << std::endl;
-            }
-        }
-        else if (!p2CanCast && p2Spell.type != SpellType::Miss)
-        {
-            std::cout << player2.getName() << " har ikke nok mana til " << p2Spell.name << "!" << std::endl;
-        }
-
-        // Tjek win condition (Flyttet UD af Player 2's spell tjek)
-        if (player1.getHp() <= 0 || player2.getHp() <= 0)
-        {
-            currentState = GameState::GAME_OVER;
-        }
-        else
-        {
-            currentState = GameState::BROADCASTING;
-        }
-    }
-    break;
-
-    case GameState::BROADCASTING:
-    {
-        std::cout << "\nStatus efter runde " << roundNumber << ":" << std::endl;
-        std::cout << player1.getName() << " - HP: " << player1.getHp() << ", Mana: " << player1.getMana() << std::endl;
-        std::cout << player2.getName() << " - HP: " << player2.getHp() << ", Mana: " << player2.getMana() << std::endl;
-
-        {
             std::string jsonStr = getGameStateJson().dump();
             std::cout << "\n[Broadcaster JSON via ZeroMQ port 5555]\n"
                       << getGameStateJson().dump(4) << "\n"
                       << std::endl;
 
-            // Byg en ZeroMQ besked og send den afsted!
             zmq::message_t message(jsonStr.size());
             memcpy(message.data(), jsonStr.c_str(), jsonStr.size());
             zmqPublisher.send(message, zmq::send_flags::none);
+
+            roundNumber++;
+            currentState = GameState::STARTING;
         }
-
-        roundNumber++;
-        currentState = GameState::STARTING; // Start næste runde
-    }
-    break;
-
-    case GameState::GAME_OVER:
-        std::cout << "\n=== SPILLET ER SLUT! ===" << std::endl;
-        if (player1.getHp() > player2.getHp())
-            std::cout << player1.getName() << " VINDER!" << std::endl;
-        else if (player2.getHp() > player1.getHp())
-            std::cout << player2.getName() << " VINDER!" << std::endl;
-        else
-            std::cout << "Det blev uafgjort!" << std::endl;
-
-        isRunning = false;
         break;
-    }
-}
-}
+
+        case GameState::GAME_OVER:
+            std::cout << "\n=== SPILLET ER SLUT! ===" << std::endl;
+            if (player1.getHp() > player2.getHp())
+                std::cout << player1.getName() << " VINDER!" << std::endl;
+            else if (player2.getHp() > player1.getHp())
+                std::cout << player2.getName() << " VINDER!" << std::endl;
+            else
+                std::cout << "Det blev uafgjort!" << std::endl;
+
+            isRunning = false;
+            break;
+        } // Slut på switch
+    } // Slut på while
+} // Slut på run()
 
 nlohmann::json GameMaster::getGameStateJson() const
 {
