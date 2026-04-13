@@ -35,9 +35,9 @@ void Player::takeDamage(int amount)
 
     if (shieldUp)
     {
-        std::cout << name << "blokerede angreb med shield" << std::endl;
+        std::cout << name << " blokerede halvdelen af angrebet med sit shield!" << std::endl;
+        amount /= 2; // Halverer skaden
         shieldUp = false;
-        return;
     }
 
     hp -= amount;

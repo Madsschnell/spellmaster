@@ -1,8 +1,11 @@
 #include "GameMaster.hpp"
 #include "ConsoleInputProvider.hpp"
+#include <fstream>
 
 GameMaster::GameMaster()
-    : currentState(GameState::STARTING),
+    : zmqContext(1),
+      zmqPublisher(zmqContext, zmq::socket_type::pub),
+      currentState(GameState::STARTING),
       roundNumber(1),
       player1("Spiller 1", 100, 50),
       player2("Spiller 2", 100, 50),
@@ -10,10 +13,16 @@ GameMaster::GameMaster()
       p2Input(0),
       p1Spell(Spell::Miss()),
       p2Spell(Spell::Miss()),
-      inputProvider(std::make_unique<ConsoleInputProvider>()) {}
+      inputProvider(std::make_unique<ConsoleInputProvider>())
+{
+    zmqPublisher.bind("tcp://*:5555"); // Åbner port 5555 til broadcasting
+    loadSpells("spells.json");
+}
 
 GameMaster::GameMaster(std::unique_ptr<InputProvider> provider)
-    : currentState(GameState::STARTING),
+    : zmqContext(1),
+      zmqPublisher(zmqContext, zmq::socket_type::pub),
+      currentState(GameState::STARTING),
       roundNumber(1),
       player1("Spiller 1", 100, 50),
       player2("Spiller 2", 100, 50),
@@ -21,23 +30,57 @@ GameMaster::GameMaster(std::unique_ptr<InputProvider> provider)
       p2Input(0),
       p1Spell(Spell::Miss()),
       p2Spell(Spell::Miss()),
-      inputProvider(std::move(provider)) {}
+      inputProvider(std::move(provider))
+{
+    zmqPublisher.bind("tcp://*:5555");
+    loadSpells("spells.json");
+}
+
+void GameMaster::loadSpells(const std::string &filepath)
+{
+    std::ifstream file(filepath);
+    if (file.is_open())
+    {
+        nlohmann::json j;
+        file >> j;
+
+        spellDatabase.clear(); // Ryd indbyggede spells, vi vil kun bruge JSON!
+
+        // Gennemløb alle spells i JSON-filen dynamisk
+        for (auto &[key, value] : j.items())
+        {
+            Spell s = value.value("defensive", false) ? Spell::Shield() : Spell::Fireball();
+            s.name = key;
+            s.manaCost = value.value("manaCost", 0);
+            s.damage = value.value("damage", 0);
+            s.healAmount = value.value("heal", 0);
+
+            int id = value.value("id", 0);
+            if (id > 0)
+            {
+                spellDatabase[id] = s;
+            }
+        }
+        std::cout << "[GameMaster] Spells indlaest fra " << filepath << std::endl;
+    }
+    else
+    {
+        std::cerr << "[Advarsel] Kunne ikke finde " << filepath << " - bruger indbyggede standard spells." << std::endl;
+        spellDatabase[1] = Spell::Fireball();
+        spellDatabase[2] = Spell::Lightning();
+        spellDatabase[3] = Spell::Shield();
+        spellDatabase[4] = Spell::Heal();
+    }
+}
 
 Spell GameMaster::inputToSpell(int input)
 {
-    switch (input)
+    // Prøv at slå spell-nummeret op i vores map
+    if (spellDatabase.find(input) != spellDatabase.end())
     {
-    case 1:
-        return Spell::Fireball();
-    case 2:
-        return Spell::Lightning();
-    case 3:
-        return Spell::Shield();
-    case 4:
-        return Spell::Heal();
-    default:
-        return Spell::Miss();
+        return spellDatabase[input];
     }
+    return Spell::Miss(); // Hvis spilleren taster noget forkert, bliver det et Miss
 }
 
 void GameMaster::run()
@@ -52,8 +95,19 @@ void GameMaster::run()
         {
         case GameState::STARTING:
             std::cout << "\n[Runde " << roundNumber << " starter!]" << std::endl;
-            std::cout << "Spells: 1=Fireball(10 mana, 20 dmg), 2=Lightning(20 mana, 30 dmg),"
-                      << " 3=Shield(15 mana), 4=Heal(25 mana, +30 HP), 0=Miss" << std::endl;
+
+            std::cout << "Spells: ";
+            for (const auto &pair : spellDatabase)
+            {
+                std::cout << pair.first << "=" << pair.second.name << "(" << pair.second.manaCost << " mana";
+                if (pair.second.damage > 0)
+                    std::cout << ", " << pair.second.damage << " dmg";
+                if (pair.second.healAmount > 0)
+                    std::cout << ", +" << pair.second.healAmount << " HP";
+                std::cout << "), ";
+            }
+            std::cout << "0=Miss" << std::endl;
+
             currentState = GameState::INPUT_PHASE;
             break;
 
@@ -144,27 +198,39 @@ void GameMaster::run()
                     std::cout << player2.getName() << " kaster " << p2Spell.name
                               << " og healer sig selv for " << p2Spell.healAmount << " HP!" << std::endl;
                 }
-                else if (!p2CanCast && p2Spell.type != SpellType::Miss)
-                {
-                    std::cout << player2.getName() << " har ikke nok mana til " << p2Spell.name << "!" << std::endl;
-                }
-
-                // Tjek win condition
-                if (player1.getHp() <= 0 || player2.getHp() <= 0)
-                {
-                    currentState = GameState::GAME_OVER;
-                }
-                else
-                {
-                    currentState = GameState::BROADCASTING;
-                }
-                break;
             }
+            else if (!p2CanCast && p2Spell.type != SpellType::Miss)
+            {
+                std::cout << player2.getName() << " har ikke nok mana til " << p2Spell.name << "!" << std::endl;
+            }
+
+            // Tjek win condition (Flyttet UD af Player 2's spell tjek)
+            if (player1.getHp() <= 0 || player2.getHp() <= 0)
+            {
+                currentState = GameState::GAME_OVER;
+            }
+            else
+            {
+                currentState = GameState::BROADCASTING;
+            }
+            break;
 
         case GameState::BROADCASTING:
             std::cout << "\nStatus efter runde " << roundNumber << ":" << std::endl;
             std::cout << player1.getName() << " - HP: " << player1.getHp() << ", Mana: " << player1.getMana() << std::endl;
             std::cout << player2.getName() << " - HP: " << player2.getHp() << ", Mana: " << player2.getMana() << std::endl;
+
+            {
+                std::string jsonStr = getGameStateJson().dump();
+                std::cout << "\n[Broadcaster JSON via ZeroMQ port 5555]\n"
+                          << getGameStateJson().dump(4) << "\n"
+                          << std::endl;
+
+                // Byg en ZeroMQ besked og send den afsted!
+                zmq::message_t message(jsonStr.size());
+                memcpy(message.data(), jsonStr.c_str(), jsonStr.size());
+                zmqPublisher.send(message, zmq::send_flags::none);
+            }
 
             roundNumber++;
             currentState = GameState::STARTING; // Start næste runde
@@ -184,3 +250,23 @@ void GameMaster::run()
         }
         }
     }
+}
+
+nlohmann::json GameMaster::getGameStateJson() const
+{
+    nlohmann::json j;
+    j["gameState"] = static_cast<int>(currentState);
+    j["roundNumber"] = roundNumber;
+
+    j["player1"] = {
+        {"hp", player1.getHp()},
+        {"mana", player1.getMana()},
+        {"shieldActive", player1.activeShield()}};
+
+    j["player2"] = {
+        {"hp", player2.getHp()},
+        {"mana", player2.getMana()},
+        {"shieldActive", player2.activeShield()}};
+
+    return j;
+}

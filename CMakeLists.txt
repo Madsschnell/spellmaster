@@ -12,3 +12,12 @@ file(GLOB SOURCES "src/*.cpp")
 
 # Skaber det kørbare program
 add_executable(GameMasterApp ${SOURCES})
+
+# Finder ZeroMQ (kræver at cppzmq-dev er installeret)
+find_package(cppzmq REQUIRED)
+
+# Henter nlohmann/json automatisk ned via nettet, så det virker på alle computere
+include(FetchContent)
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
+FetchContent_MakeAvailable(json)
+target_link_libraries(GameMasterApp PRIVATE nlohmann_json::nlohmann_json cppzmq)

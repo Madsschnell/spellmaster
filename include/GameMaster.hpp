@@ -5,6 +5,9 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <map>
+#include <nlohmann/json.hpp>
+#include <zmq.hpp>
 
 // Vores State Machine
 enum class GameState
@@ -19,6 +22,10 @@ enum class GameState
 class GameMaster
 {
 private:
+    // ZeroMQ netværk til at broadcaste (sende) spillets tilstand
+    zmq::context_t zmqContext;
+    zmq::socket_t zmqPublisher;
+
     GameState currentState;
     Player player1;
     Player player2;
@@ -35,6 +42,10 @@ private:
     Spell p1Spell;
     Spell p2Spell;
 
+    // Database til at gemme vores spells indlæst fra JSON
+    std::map<int, Spell> spellDatabase;
+    void loadSpells(const std::string &filepath);
+
     // Hjælpefunktion til at konvertere input til Spell
     Spell inputToSpell(int input);
 
@@ -42,4 +53,7 @@ public:
     GameMaster();
     explicit GameMaster(std::unique_ptr<InputProvider> provider);
     void run(); // Selve spil-loopet
+
+    // Genererer en JSON-repræsentation af spillets tilstand til BROADCASTING
+    nlohmann::json getGameStateJson() const;
 };
