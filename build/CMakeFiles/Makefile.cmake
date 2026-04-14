@@ -7,7 +7,7 @@ set(CMAKE_DEPENDS_GENERATOR "Unix Makefiles")
 # The top level Makefile was generated from the following files:
 set(CMAKE_MAKEFILE_DEPENDS
   "CMakeCache.txt"
-  "/home/au768175/Spellmaster/Test1/CMakeLists.txt"
+  "/home/au768175/Spellmaster/Test1/spellmaster/CMakeLists.txt"
   "CMakeFiles/3.31.6/CMakeCCompiler.cmake"
   "CMakeFiles/3.31.6/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.31.6/CMakeSystem.cmake"
@@ -104,7 +104,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/share/cmake-3.31/Modules/Compiler/zOS-CXX-DetermineCompiler.cmake"
   "/usr/share/cmake-3.31/Modules/FindPackageHandleStandardArgs.cmake"
   "/usr/share/cmake-3.31/Modules/FindPackageMessage.cmake"
-  "/usr/share/cmake-3.31/Modules/FindPkgConfig.cmake"
   "/usr/share/cmake-3.31/Modules/Internal/CMakeCLinkerInformation.cmake"
   "/usr/share/cmake-3.31/Modules/Internal/CMakeCXXLinkerInformation.cmake"
   "/usr/share/cmake-3.31/Modules/Internal/CMakeCommonLinkerInformation.cmake"
@@ -144,5 +143,5 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/camera_stream.dir/DependInfo.cmake"
+  "CMakeFiles/spellmaster.dir/DependInfo.cmake"
   )

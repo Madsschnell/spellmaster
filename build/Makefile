@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/au768175/Spellmaster/Test1
+CMAKE_SOURCE_DIR = /home/au768175/Spellmaster/Test1/spellmaster
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/au768175/Spellmaster/Test1/build
+CMAKE_BINARY_DIR = /home/au768175/Spellmaster/Test1/spellmaster/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/au768175/Spellmaster/Test1/build/CMakeFiles /home/au768175/Spellmaster/Test1/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/au768175/Spellmaster/Test1/spellmaster/build/CMakeFiles /home/au768175/Spellmaster/Test1/spellmaster/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/au768175/Spellmaster/Test1/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/au768175/Spellmaster/Test1/spellmaster/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -117,41 +117,65 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named camera_stream
+# Target rules for targets named spellmaster
 
 # Build rule for target.
-camera_stream: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 camera_stream
-.PHONY : camera_stream
+spellmaster: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 spellmaster
+.PHONY : spellmaster
 
 # fast build rule for target.
-camera_stream/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/camera_stream.dir/build.make CMakeFiles/camera_stream.dir/build
-.PHONY : camera_stream/fast
+spellmaster/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/spellmaster.dir/build.make CMakeFiles/spellmaster.dir/build
+.PHONY : spellmaster/fast
 
-camera_stream.o: camera_stream.cpp.o
-.PHONY : camera_stream.o
+gesture_classifier.o: gesture_classifier.cpp.o
+.PHONY : gesture_classifier.o
 
 # target to build an object file
-camera_stream.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/camera_stream.dir/build.make CMakeFiles/camera_stream.dir/camera_stream.cpp.o
-.PHONY : camera_stream.cpp.o
+gesture_classifier.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/spellmaster.dir/build.make CMakeFiles/spellmaster.dir/gesture_classifier.cpp.o
+.PHONY : gesture_classifier.cpp.o
 
-camera_stream.i: camera_stream.cpp.i
-.PHONY : camera_stream.i
+gesture_classifier.i: gesture_classifier.cpp.i
+.PHONY : gesture_classifier.i
 
 # target to preprocess a source file
-camera_stream.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/camera_stream.dir/build.make CMakeFiles/camera_stream.dir/camera_stream.cpp.i
-.PHONY : camera_stream.cpp.i
+gesture_classifier.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/spellmaster.dir/build.make CMakeFiles/spellmaster.dir/gesture_classifier.cpp.i
+.PHONY : gesture_classifier.cpp.i
 
-camera_stream.s: camera_stream.cpp.s
-.PHONY : camera_stream.s
+gesture_classifier.s: gesture_classifier.cpp.s
+.PHONY : gesture_classifier.s
 
 # target to generate assembly for a file
-camera_stream.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/camera_stream.dir/build.make CMakeFiles/camera_stream.dir/camera_stream.cpp.s
-.PHONY : camera_stream.cpp.s
+gesture_classifier.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/spellmaster.dir/build.make CMakeFiles/spellmaster.dir/gesture_classifier.cpp.s
+.PHONY : gesture_classifier.cpp.s
+
+main.o: main.cpp.o
+.PHONY : main.o
+
+# target to build an object file
+main.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/spellmaster.dir/build.make CMakeFiles/spellmaster.dir/main.cpp.o
+.PHONY : main.cpp.o
+
+main.i: main.cpp.i
+.PHONY : main.i
+
+# target to preprocess a source file
+main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/spellmaster.dir/build.make CMakeFiles/spellmaster.dir/main.cpp.i
+.PHONY : main.cpp.i
+
+main.s: main.cpp.s
+.PHONY : main.s
+
+# target to generate assembly for a file
+main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/spellmaster.dir/build.make CMakeFiles/spellmaster.dir/main.cpp.s
+.PHONY : main.cpp.s
 
 # Help Target
 help:
@@ -161,10 +185,13 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... camera_stream"
-	@echo "... camera_stream.o"
-	@echo "... camera_stream.i"
-	@echo "... camera_stream.s"
+	@echo "... spellmaster"
+	@echo "... gesture_classifier.o"
+	@echo "... gesture_classifier.i"
+	@echo "... gesture_classifier.s"
+	@echo "... main.o"
+	@echo "... main.i"
+	@echo "... main.s"
 .PHONY : help
 
 

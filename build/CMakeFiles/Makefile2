@@ -54,20 +54,20 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/au768175/Spellmaster/Test1
+CMAKE_SOURCE_DIR = /home/au768175/Spellmaster/Test1/spellmaster
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/au768175/Spellmaster/Test1/build
+CMAKE_BINARY_DIR = /home/au768175/Spellmaster/Test1/spellmaster/build
 
 #=============================================================================
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles/camera_stream.dir/all
+all: CMakeFiles/spellmaster.dir/all
 .PHONY : all
 
 # The main recursive "codegen" target.
-codegen: CMakeFiles/camera_stream.dir/codegen
+codegen: CMakeFiles/spellmaster.dir/codegen
 .PHONY : codegen
 
 # The main recursive "preinstall" target.
@@ -75,40 +75,40 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean: CMakeFiles/camera_stream.dir/clean
+clean: CMakeFiles/spellmaster.dir/clean
 .PHONY : clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/camera_stream.dir
+# Target rules for target CMakeFiles/spellmaster.dir
 
 # All Build rule for target.
-CMakeFiles/camera_stream.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/camera_stream.dir/build.make CMakeFiles/camera_stream.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/camera_stream.dir/build.make CMakeFiles/camera_stream.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/au768175/Spellmaster/Test1/build/CMakeFiles --progress-num=1,2 "Built target camera_stream"
-.PHONY : CMakeFiles/camera_stream.dir/all
+CMakeFiles/spellmaster.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/spellmaster.dir/build.make CMakeFiles/spellmaster.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/spellmaster.dir/build.make CMakeFiles/spellmaster.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/au768175/Spellmaster/Test1/spellmaster/build/CMakeFiles --progress-num=1,2,3 "Built target spellmaster"
+.PHONY : CMakeFiles/spellmaster.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/camera_stream.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/au768175/Spellmaster/Test1/build/CMakeFiles 2
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/camera_stream.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/au768175/Spellmaster/Test1/build/CMakeFiles 0
-.PHONY : CMakeFiles/camera_stream.dir/rule
+CMakeFiles/spellmaster.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/au768175/Spellmaster/Test1/spellmaster/build/CMakeFiles 3
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/spellmaster.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/au768175/Spellmaster/Test1/spellmaster/build/CMakeFiles 0
+.PHONY : CMakeFiles/spellmaster.dir/rule
 
 # Convenience name for target.
-camera_stream: CMakeFiles/camera_stream.dir/rule
-.PHONY : camera_stream
+spellmaster: CMakeFiles/spellmaster.dir/rule
+.PHONY : spellmaster
 
 # codegen rule for target.
-CMakeFiles/camera_stream.dir/codegen:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/camera_stream.dir/build.make CMakeFiles/camera_stream.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/au768175/Spellmaster/Test1/build/CMakeFiles --progress-num=1,2 "Finished codegen for target camera_stream"
-.PHONY : CMakeFiles/camera_stream.dir/codegen
+CMakeFiles/spellmaster.dir/codegen:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/spellmaster.dir/build.make CMakeFiles/spellmaster.dir/codegen
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/au768175/Spellmaster/Test1/spellmaster/build/CMakeFiles --progress-num=1,2,3 "Finished codegen for target spellmaster"
+.PHONY : CMakeFiles/spellmaster.dir/codegen
 
 # clean rule for target.
-CMakeFiles/camera_stream.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/camera_stream.dir/build.make CMakeFiles/camera_stream.dir/clean
-.PHONY : CMakeFiles/camera_stream.dir/clean
+CMakeFiles/spellmaster.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/spellmaster.dir/build.make CMakeFiles/spellmaster.dir/clean
+.PHONY : CMakeFiles/spellmaster.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

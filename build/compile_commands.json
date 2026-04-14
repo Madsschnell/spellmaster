@@ -1,0 +1,14 @@
+[
+{
+  "directory": "/home/au768175/Spellmaster/Test1/spellmaster/build",
+  "command": "/usr/bin/c++  -isystem /usr/include/opencv4 -std=gnu++17 -o CMakeFiles/spellmaster.dir/main.cpp.o -c /home/au768175/Spellmaster/Test1/spellmaster/main.cpp",
+  "file": "/home/au768175/Spellmaster/Test1/spellmaster/main.cpp",
+  "output": "CMakeFiles/spellmaster.dir/main.cpp.o"
+},
+{
+  "directory": "/home/au768175/Spellmaster/Test1/spellmaster/build",
+  "command": "/usr/bin/c++  -isystem /usr/include/opencv4 -std=gnu++17 -o CMakeFiles/spellmaster.dir/gesture_classifier.cpp.o -c /home/au768175/Spellmaster/Test1/spellmaster/gesture_classifier.cpp",
+  "file": "/home/au768175/Spellmaster/Test1/spellmaster/gesture_classifier.cpp",
+  "output": "CMakeFiles/spellmaster.dir/gesture_classifier.cpp.o"
+}
+]
