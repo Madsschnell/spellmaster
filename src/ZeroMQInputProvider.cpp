@@ -22,7 +22,7 @@ void ZeroMQInputProvider::initialize()
     // Binder til port 5556 på alle netværksgrænseflader (ifølge README)
     socket.bind("tcp://*:5556");
 
-    int timeout = 5000;
+    int timeout = 10000;
     socket.set(zmq::sockopt::rcvtimeo, timeout);
 }
 

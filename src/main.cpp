@@ -4,10 +4,11 @@
 
 int main()
 {
-    // Opret GameMaster (den laver sin egen ZeroMQ context)
-    GameMaster gm;
+    // Opret GameMaster med ZeroMQ Input Provider
+    // Venter nu på input fra anden RPi på port 5556 (i stedet for console)
+    GameMaster gm(std::make_unique<ZeroMQInputProvider>());
 
-    // Start spillet - GameMaster bruger ConsoleInputProvider som default
+    // Start spillet - broadcaster game state på port 5555
     gm.run();
 
     return 0;
