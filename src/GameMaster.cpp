@@ -76,6 +76,9 @@ void GameMaster::loadSpells(const std::string &filepath)
     else
     {
         std::cerr << "[Advarsel] Kunne ikke finde " << filepath << " - bruger indbyggede standard spells." << std::endl;
+
+        // TODO: Fjern hardcoded spells senere - implementer kun JSON-baseret spell loading for production
+        // Dette gør koden mere professionel og fleksibel for rapporten
         spellDatabase[1] = Spell::Fireball();
         spellDatabase[2] = Spell::Lightning();
         spellDatabase[3] = Spell::Shield();
