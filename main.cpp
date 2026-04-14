@@ -31,6 +31,9 @@ static const cv::Scalar CURSOR_COLOR = {255, 255, 255};
 // Botched timeout (no gesture for this long)
 static constexpr double BOTCHED_TIMEOUT = 20.0; // seconds
 
+// Drawing window (auto-clear canvas after this long)
+static constexpr double DRAW_WINDOW_SEC = 10.0;
+
 int main()
 {
     const int frameSize = CAP_W * CAP_H * 3 / 2;
@@ -67,6 +70,9 @@ int main()
     double lastSpellTime = 0.0;
 
     double lastSeenTime = (double)cv::getTickCount() / cv::getTickFrequency();
+
+    bool inDrawWindow = false;
+    double drawWindowStart = 0.0;
 
     while (true)
     {
@@ -113,6 +119,26 @@ int main()
         bool drawActive = irSeen;
 
         double now = (double)cv::getTickCount() / cv::getTickFrequency();
+
+        if (drawActive)
+        {
+            if (!inDrawWindow)
+            {
+                inDrawWindow = true;
+                drawWindowStart = now;
+            }
+            else if ((now - drawWindowStart) >= DRAW_WINDOW_SEC)
+            {
+                canvas = cv::Mat::zeros(CAP_H, CAP_W, CV_8UC3);
+                gesture.clear();
+                prevPt = {-1, -1};
+                drawWindowStart = now;
+            }
+        }
+        else
+        {
+            inDrawWindow = false;
+        }
 
         if (irSeen)
         {

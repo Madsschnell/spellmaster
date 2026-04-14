@@ -37,6 +37,9 @@ static constexpr int BRUSH_RADIUS = 8;      // pixels
 static constexpr float BRUSH_ALPHA = 0.85f; // opacity of drawn trail (0-1)
 static constexpr int TRAIL_LEN = 0;         // 0 = permanent; >0 = fade after N frames
 
+// Draw window
+static constexpr double DRAW_WINDOW_SEC = 10.0;
+
 // Colours (BGR) – change to taste
 static const cv::Scalar BRUSH_COLOR = {50, 220, 255};   // yellow-ish
 static const cv::Scalar CURSOR_COLOR = {255, 255, 255}; // white crosshair
@@ -76,6 +79,9 @@ int main()
     cv::resizeWindow("IR Drawing", CAP_W, CAP_H);
 
     cv::Point prevPt(-1, -1);
+
+    bool inDrawWindow = false;
+    double drawWindowStart = 0.0;
 
     while (true)
     {
@@ -126,6 +132,28 @@ int main()
             bool irSeen = (tip.x >= 0);
 
             bool drawActive = irSeen;
+
+            double now = (double)cv::getTickCount() / cv::getTickFrequency();
+
+            if (drawActive)
+            {
+                if (!inDrawWindow)
+                {
+                    inDrawWindow = true;
+                    drawWindowStart = now;
+                }
+                else if ((now - drawWindowStart) >= DRAW_WINDOW_SEC)
+                {
+                    canvas = cv::Mat::zeros(CAP_H, CAP_W, CV_8UC3);
+                    prevPt = {-1, -1};
+                    trail.clear();
+                    drawWindowStart = now;
+                }
+            }
+            else
+            {
+                inDrawWindow = false;
+            }
 
             if (drawActive && prevPt.x >= 0)
             {
