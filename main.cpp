@@ -33,6 +33,7 @@ static constexpr double BOTCHED_TIMEOUT = 20.0; // seconds
 
 // Drawing window (auto-clear canvas after this long)
 static constexpr double DRAW_WINDOW_SEC = 10.0;
+static constexpr double DRAW_END_GAP_SEC = 0.25;
 
 int main()
 {
@@ -73,6 +74,8 @@ int main()
 
     bool inDrawWindow = false;
     double drawWindowStart = 0.0;
+    double lastDrawActiveTime = 0.0;
+    bool waitForRelease = false;
 
     while (true)
     {
@@ -120,22 +123,42 @@ int main()
 
         double now = (double)cv::getTickCount() / cv::getTickFrequency();
 
+        if (waitForRelease)
+        {
+            // Force a "pen up" after the auto-clear so the cleared canvas is
+            // visible and the next draw window starts cleanly.
+            drawActive = false;
+            if (!irSeen)
+                waitForRelease = false;
+        }
+
         if (drawActive)
         {
             if (!inDrawWindow)
             {
                 inDrawWindow = true;
                 drawWindowStart = now;
+                lastDrawActiveTime = now;
             }
-            else if ((now - drawWindowStart) >= DRAW_WINDOW_SEC)
-            {
-                canvas = cv::Mat::zeros(CAP_H, CAP_W, CV_8UC3);
-                gesture.clear();
-                prevPt = {-1, -1};
-                drawWindowStart = now;
-            }
+            lastDrawActiveTime = now;
         }
-        else
+
+        // Auto-clear after the draw window expires (clears the visible yellow trail).
+        // This check is outside drawActive so a one-frame IR dropout can't prevent it.
+        if (inDrawWindow && (now - drawWindowStart) >= DRAW_WINDOW_SEC)
+        {
+            canvas = cv::Mat::zeros(CAP_H, CAP_W, CV_8UC3);
+            gesture.clear();
+            prevPt = {-1, -1};
+            drawWindowStart = now;
+            lastDrawActiveTime = now;
+            inDrawWindow = false;
+            waitForRelease = true;
+        }
+
+        // End the current draw window only after a small gap without IR.
+        // This avoids single-frame detection flicker constantly restarting the timer.
+        if (inDrawWindow && !drawActive && (now - lastDrawActiveTime) > DRAW_END_GAP_SEC)
         {
             inDrawWindow = false;
         }
@@ -163,7 +186,8 @@ int main()
         }
         else
         {
-            if (!gesture.empty())
+            // Debounce brief IR dropouts so we don't end a gesture instantly.
+            if (!gesture.empty() && (now - lastDrawActiveTime) > DRAW_END_GAP_SEC)
             {
                 Spell s = classifyGesture(gesture, cv::Size(CAP_W, CAP_H));
                 if (s == Spell::NONE)

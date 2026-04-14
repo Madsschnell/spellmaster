@@ -39,6 +39,7 @@ static constexpr int TRAIL_LEN = 0;         // 0 = permanent; >0 = fade after N 
 
 // Draw window
 static constexpr double DRAW_WINDOW_SEC = 10.0;
+static constexpr double DRAW_END_GAP_SEC = 0.25;
 
 // Colours (BGR) – change to taste
 static const cv::Scalar BRUSH_COLOR = {50, 220, 255};   // yellow-ish
@@ -82,6 +83,8 @@ int main()
 
     bool inDrawWindow = false;
     double drawWindowStart = 0.0;
+    double lastDrawActiveTime = 0.0;
+    bool waitForRelease = false;
 
     while (true)
     {
@@ -135,22 +138,36 @@ int main()
 
             double now = (double)cv::getTickCount() / cv::getTickFrequency();
 
+            if (waitForRelease)
+            {
+                drawActive = false;
+                if (!irSeen)
+                    waitForRelease = false;
+            }
+
             if (drawActive)
             {
                 if (!inDrawWindow)
                 {
                     inDrawWindow = true;
                     drawWindowStart = now;
+                    lastDrawActiveTime = now;
                 }
-                else if ((now - drawWindowStart) >= DRAW_WINDOW_SEC)
-                {
-                    canvas = cv::Mat::zeros(CAP_H, CAP_W, CV_8UC3);
-                    prevPt = {-1, -1};
-                    trail.clear();
-                    drawWindowStart = now;
-                }
+                lastDrawActiveTime = now;
             }
-            else
+
+            if (inDrawWindow && (now - drawWindowStart) >= DRAW_WINDOW_SEC)
+            {
+                canvas = cv::Mat::zeros(CAP_H, CAP_W, CV_8UC3);
+                prevPt = {-1, -1};
+                trail.clear();
+                drawWindowStart = now;
+                lastDrawActiveTime = now;
+                inDrawWindow = false;
+                waitForRelease = true;
+            }
+
+            if (inDrawWindow && !drawActive && (now - lastDrawActiveTime) > DRAW_END_GAP_SEC)
             {
                 inDrawWindow = false;
             }
