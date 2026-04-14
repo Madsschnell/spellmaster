@@ -199,7 +199,7 @@ void GameMaster::run()
             {
                 currentState = GameState::BROADCASTING;
             }
-        } // <--- HER var din manglende parentes!
+        }
         break;
 
         case GameState::BROADCASTING:
@@ -234,9 +234,9 @@ void GameMaster::run()
             inputProvider->shutdown(); // Ryd op efter input provider (lukker netværksforbindelser)
             isRunning = false;
             break;
-        } // Slut på switch
-    } // Slut på while
-} // Slut på run()
+        }
+    }
+}
 
 nlohmann::json GameMaster::getGameStateJson() const
 {
