@@ -1,9 +1,4 @@
 #include "ZeroMQInputProvider.hpp"
-#include <nlohmann/json.hpp>
-#include <iostream>
-
-#include "ZeroMQInputProvider.hpp"
-#include <nlohmann/json.hpp>
 #include <iostream>
 
 ZeroMQInputProvider::ZeroMQInputProvider(zmq::context_t &sharedContext)
@@ -19,10 +14,8 @@ ZeroMQInputProvider::~ZeroMQInputProvider()
 
 void ZeroMQInputProvider::initialize()
 {
-    // Binder til port 5556 på alle netværksgrænseflader (ifølge README)
     socket.bind("tcp://*:5556");
-
-    int timeout = 10000;
+    int timeout = 100; // 100ms non-blocking timeout
     socket.set(zmq::sockopt::rcvtimeo, timeout);
 }
 
@@ -37,57 +30,42 @@ void ZeroMQInputProvider::shutdown()
     }
 }
 
-int ZeroMQInputProvider::getSpellInput(const std::string &playerName)
+SpellMessage ZeroMQInputProvider::getSpellInput(const std::string &playerName)
 {
-    // 1. Tjek om vi allerede har modtaget input fra denne spiller i en tidligere kørsel
+    // Check if we already have input from this player from a previous call
     if (inputBuffer.count(playerName))
     {
-        int spellId = inputBuffer[playerName];
-        inputBuffer.erase(playerName); // Ryd op i bufferen
-        std::cout << "[ZeroMQ] Brugte gemt input fra " << playerName << std::endl;
-        return spellId;
+        SpellMessage msg = inputBuffer[playerName];
+        inputBuffer.erase(playerName);
+        return msg;
     }
-
-    std::cout << "Venter paa at " << playerName << " kaster en spell (ZeroMQ)..." << std::endl;
 
     while (true)
     {
         zmq::message_t request;
-
-        // Forsøg at modtage besked. Hvis du har sat timeout i initialize(),
-        // returnerer den false hvis tiden løber ud.
         auto result = socket.recv(request, zmq::recv_flags::none);
 
         if (!result)
         {
-            std::cout << "[ZeroMQ] Timeout: " << playerName << " svarede ikke. Returnerer Miss." << std::endl;
-            return 0; // Spell ID 0 = Miss
+            return SpellMessage{playerName, ""}; // Timeout - return Miss
         }
 
-        std::string msg_str(static_cast<char *>(request.data()), request.size());
-
-        try
+        // Receive SpellMessage struct as binary data
+        if (request.size() == sizeof(SpellMessage))
         {
-            auto j = nlohmann::json::parse(msg_str);
-            std::string senderName = j.value("playerName", "");
-            int spellId = j.value("spellId", 0);
+            SpellMessage msg;
+            memcpy(&msg, request.data(), sizeof(SpellMessage));
 
-            // 2. Er det den spiller vi venter på?
-            if (senderName == playerName)
+            // Check if this is the player we're waiting for
+            if (msg.playerId == playerName)
             {
-                return spellId;
+                return msg;
             }
-            else if (!senderName.empty())
+            else if (!msg.playerId.empty())
             {
-                // 3. Det var en anden spiller (f.eks. Spiller 2 sendte mens vi ventede på 1).
-                // Gem det i bufferen til senere!
-                inputBuffer[senderName] = spellId;
-                std::cout << "[ZeroMQ] Modtog input fra " << senderName << " (gemt i buffer)" << std::endl;
+                // Store for later if it's from another player
+                inputBuffer[msg.playerId] = msg;
             }
-        }
-        catch (const nlohmann::json::exception &e)
-        {
-            std::cerr << "[ZeroMQ] Ugyldig JSON modtaget: " << e.what() << std::endl;
         }
     }
 }

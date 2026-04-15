@@ -1,5 +1,6 @@
 #pragma once
 #include "InputProvider.hpp"
+#include "SpellMessage.hpp"
 #include <zmq.hpp>
 #include <string>
 #include <memory>
@@ -10,7 +11,7 @@ class ZeroMQInputProvider : public InputProvider
 private:
     zmq::context_t *context;
     zmq::socket_t socket;
-    std::map<std::string, int> inputBuffer;
+    std::map<std::string, SpellMessage> inputBuffer;
     bool ownsContext;
 
 public:
@@ -24,5 +25,5 @@ public:
 
     void initialize() override;
     void shutdown() override;
-    int getSpellInput(const std::string &playerName) override;
+    SpellMessage getSpellInput(const std::string &playerName) override;
 };

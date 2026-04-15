@@ -1,6 +1,8 @@
 #include "GameMaster.hpp"
 #include "ConsoleInputProvider.hpp"
 #include <fstream>
+#include <nlohmann/json.hpp>
+#include <chrono>
 
 GameMaster::~GameMaster()
 {
@@ -15,15 +17,15 @@ GameMaster::GameMaster()
       roundNumber(1),
       player1("Spiller 1", 100, 50),
       player2("Spiller 2", 100, 50),
-      p1Input(0),
-      p2Input(0),
+      p1Input({"Spiller 1", ""}),
+      p2Input({"Spiller 2", ""}),
       p1Spell(Spell::Miss()),
       p2Spell(Spell::Miss()),
       inputProvider(std::make_unique<ConsoleInputProvider>())
 {
     int linger = 0;
-    zmqPublisher.set(zmq::sockopt::linger, linger); // Luk socket øjeblikkeligt uden at vente
-    zmqPublisher.bind("tcp://*:5555");              // Åbner port 5555 til broadcasting
+    zmqPublisher.set(zmq::sockopt::linger, linger);
+    zmqPublisher.bind("tcp://*:5555");
     loadSpells("spells.json");
 }
 
@@ -34,8 +36,8 @@ GameMaster::GameMaster(std::unique_ptr<InputProvider> provider)
       roundNumber(1),
       player1("Spiller 1", 100, 50),
       player2("Spiller 2", 100, 50),
-      p1Input(0),
-      p2Input(0),
+      p1Input(),
+      p2Input(),
       p1Spell(Spell::Miss()),
       p2Spell(Spell::Miss()),
       inputProvider(std::move(provider))
@@ -86,14 +88,17 @@ void GameMaster::loadSpells(const std::string &filepath)
     }
 }
 
-Spell GameMaster::inputToSpell(int input)
+Spell GameMaster::spellMessageToSpell(const SpellMessage &msg)
 {
-    // Prøv at slå spell-nummeret op i vores map
-    if (spellDatabase.find(input) != spellDatabase.end())
+    // Find spell med navn i databasen
+    for (const auto &[id, spell] : spellDatabase)
     {
-        return spellDatabase[input];
+        if (spell.name == msg.spellName)
+        {
+            return spell;
+        }
     }
-    return Spell::Miss(); // Hvis spilleren taster noget forkert, bliver det et Miss
+    return Spell::Miss(); // Hvis spell navn ikke findes, blive det et Miss
 }
 
 void GameMaster::run()
@@ -126,14 +131,70 @@ void GameMaster::run()
             break;
 
         case GameState::INPUT_PHASE:
-            p1Input = inputProvider->getSpellInput(player1.getName());
-            p2Input = inputProvider->getSpellInput(player2.getName());
+        {
+            bool p1HasInput = !p1Input.spellName.empty();
+            bool p2HasInput = !p2Input.spellName.empty();
 
-            p1Spell = inputToSpell(p1Input);
-            p2Spell = inputToSpell(p2Input);
+            auto lastBroadcast = std::chrono::high_resolution_clock::now();
+
+            while (!p1HasInput || !p2HasInput)
+            {
+                auto now = std::chrono::high_resolution_clock::now();
+                auto elapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastBroadcast).count();
+
+                // Send GameStatus every 1 second
+                if (elapsedMs >= 1000)
+                {
+                    GameStatus status1 = createGameStatus(true);
+                    GameStatus status2 = createGameStatus(false);
+
+                    zmq::message_t msg1(sizeof(GameStatus));
+                    zmq::message_t msg2(sizeof(GameStatus));
+                    memcpy(msg1.data(), &status1, sizeof(GameStatus));
+                    memcpy(msg2.data(), &status2, sizeof(GameStatus));
+
+                    zmqPublisher.send(msg1, zmq::send_flags::none);
+                    zmqPublisher.send(msg2, zmq::send_flags::none);
+
+                    std::cout << "[Broadcasting] Runde " << roundNumber << " - Venter på input..." << std::endl;
+                    lastBroadcast = now;
+                }
+
+                // Try to get input from player 1
+                if (!p1HasInput)
+                {
+                    SpellMessage msg = inputProvider->getSpellInput(player1.getName());
+                    if (!msg.spellName.empty())
+                    {
+                        p1Input = msg;
+                        p1HasInput = true;
+                        std::cout << "[Input] " << player1.getName() << " valgte: " << p1Input.spellName << std::endl;
+                    }
+                }
+
+                // Try to get input from player 2
+                if (!p2HasInput)
+                {
+                    SpellMessage msg = inputProvider->getSpellInput(player2.getName());
+                    if (!msg.spellName.empty())
+                    {
+                        p2Input = msg;
+                        p2HasInput = true;
+                        std::cout << "[Input] " << player2.getName() << " valgte: " << p2Input.spellName << std::endl;
+                    }
+                }
+            }
+
+            p1Spell = spellMessageToSpell(p1Input);
+            p2Spell = spellMessageToSpell(p2Input);
+
+            // Reset inputs for next round
+            p1Input = SpellMessage{"", ""};
+            p2Input = SpellMessage{"", ""};
 
             currentState = GameState::CALCULATING;
             break;
+        }
 
         case GameState::CALCULATING:
         { // <--- Scope starter her
@@ -207,18 +268,18 @@ void GameMaster::run()
 
         case GameState::BROADCASTING:
         {
-            std::cout << "\nStatus efter runde " << roundNumber << ":" << std::endl;
-            std::cout << player1.getName() << " - HP: " << player1.getHp() << ", Mana: " << player1.getMana() << std::endl;
-            std::cout << player2.getName() << " - HP: " << player2.getHp() << ", Mana: " << player2.getMana() << std::endl;
+            // Send game status for both players via ZeroMQ
+            GameStatus status1 = createGameStatus(true);
+            GameStatus status2 = createGameStatus(false);
 
-            std::string jsonStr = getGameStateJson().dump();
-            std::cout << "\n[Broadcaster JSON via ZeroMQ port 5555]\n"
-                      << getGameStateJson().dump(4) << "\n"
-                      << std::endl;
+            // Send both structs as binary data
+            zmq::message_t msg1(sizeof(GameStatus));
+            memcpy(msg1.data(), &status1, sizeof(GameStatus));
+            zmqPublisher.send(msg1, zmq::send_flags::none);
 
-            zmq::message_t message(jsonStr.size());
-            memcpy(message.data(), jsonStr.c_str(), jsonStr.size());
-            zmqPublisher.send(message, zmq::send_flags::none);
+            zmq::message_t msg2(sizeof(GameStatus));
+            memcpy(msg2.data(), &status2, sizeof(GameStatus));
+            zmqPublisher.send(msg2, zmq::send_flags::none);
 
             roundNumber++;
             currentState = GameState::STARTING;
@@ -241,29 +302,57 @@ void GameMaster::run()
     }
 }
 
-nlohmann::json GameMaster::getGameStateJson() const
+GameStatus GameMaster::createGameStatus(bool isPlayer1) const
 {
-    nlohmann::json j;
-    j["gameState"] = static_cast<int>(currentState);
-    j["roundNumber"] = roundNumber;
+    GameStatus status;
+    status.round = roundNumber;
+    status.phase = GamePhase::CASTING; // For nu, kan udvides senere
 
-    j["player1"] = {
-        {"name", player1.getName()},
-        {"hp", player1.getHp()},
-        {"mana", player1.getMana()},
-        {"shieldActive", player1.activeShield()},
-        {"lastSpell", p1Spell.name},
-        {"lastSpellDamage", p1Spell.damage},
-        {"lastSpellHeal", p1Spell.healAmount}};
+    // Selv (self) er den aktuelle spiller
+    if (isPlayer1)
+    {
+        status.self.name = player1.getName();
+        status.self.hp = player1.getHp();
+        status.self.maxHp = 100; // TODO: Get from Player object
+        status.self.mana = player1.getMana();
+        status.self.maxMana = 50; // TODO: Get from Player object
+        status.self.spellCast = p1Spell.name;
+        status.self.spellDescription = p1Spell.damage > 0
+                                           ? std::to_string(p1Spell.damage) + " dmg"
+                                       : p1Spell.healAmount > 0
+                                           ? "+" + std::to_string(p1Spell.healAmount) + " HP"
+                                           : "Shield";
 
-    j["player2"] = {
-        {"name", player2.getName()},
-        {"hp", player2.getHp()},
-        {"mana", player2.getMana()},
-        {"shieldActive", player2.activeShield()},
-        {"lastSpell", p2Spell.name},
-        {"lastSpellDamage", p2Spell.damage},
-        {"lastSpellHeal", p2Spell.healAmount}};
+        // Modstander (opponent) er den anden spiller
+        status.opponent.name = player2.getName();
+        status.opponent.hp = player2.getHp();
+        status.opponent.maxHp = 100;
+        status.opponent.mana = player2.getMana();
+        status.opponent.maxMana = 50;
+        status.opponent.spellCast = p2Spell.name;
+    }
+    else
+    {
+        // Omvendt for Player 2
+        status.self.name = player2.getName();
+        status.self.hp = player2.getHp();
+        status.self.maxHp = 100;
+        status.self.mana = player2.getMana();
+        status.self.maxMana = 50;
+        status.self.spellCast = p2Spell.name;
+        status.self.spellDescription = p2Spell.damage > 0
+                                           ? std::to_string(p2Spell.damage) + " dmg"
+                                       : p2Spell.healAmount > 0
+                                           ? "+" + std::to_string(p2Spell.healAmount) + " HP"
+                                           : "Shield";
 
-    return j;
+        status.opponent.name = player1.getName();
+        status.opponent.hp = player1.getHp();
+        status.opponent.maxHp = 100;
+        status.opponent.mana = player1.getMana();
+        status.opponent.maxMana = 50;
+        status.opponent.spellCast = p1Spell.name;
+    }
+
+    return status;
 }

@@ -2,11 +2,12 @@
 #include "Player.hpp"
 #include "Spell.hpp"
 #include "InputProvider.hpp"
+#include "SpellMessage.hpp"
+#include "GameStatus.hpp"
 #include <iostream>
 #include <string>
 #include <memory>
 #include <map>
-#include <nlohmann/json.hpp>
 #include <zmq.hpp>
 
 // Vores State Machine
@@ -22,7 +23,6 @@ enum class GameState
 class GameMaster
 {
 private:
-    // ZeroMQ netværk til at broadcaste (sende) spillets tilstand
     zmq::context_t zmqContext;
     zmq::socket_t zmqPublisher;
 
@@ -31,30 +31,24 @@ private:
     Player player2;
     int roundNumber;
 
-    // Input provider - kan være ConsoleInputProvider eller netværksbaseret
     std::unique_ptr<InputProvider> inputProvider;
 
-    // Midlertidige variabler til at gemme terminal-input
-    int p1Input;
-    int p2Input;
+    SpellMessage p1Input;
+    SpellMessage p2Input;
 
-    // Valgte spells til denne runde
     Spell p1Spell;
     Spell p2Spell;
 
-    // Database til at gemme vores spells indlæst fra JSON
     std::map<int, Spell> spellDatabase;
     void loadSpells(const std::string &filepath);
 
-    // Hjælpefunktion til at konvertere input til Spell
-    Spell inputToSpell(int input);
+    Spell spellMessageToSpell(const SpellMessage &msg);
 
 public:
     GameMaster();
     explicit GameMaster(std::unique_ptr<InputProvider> provider);
     ~GameMaster();
-    void run(); // Selve spil-loopet
+    void run();
 
-    // Genererer en JSON-repræsentation af spillets tilstand til BROADCASTING
-    nlohmann::json getGameStateJson() const;
+    GameStatus createGameStatus(bool isPlayer1) const;
 };

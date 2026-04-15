@@ -1,6 +1,10 @@
 #include "ConsoleInputProvider.hpp"
 #include <iostream>
 
+// skal nok slettes, skal bruge zeroQT til selve spillet
+// huske at optimere gamemaster efter dette, det vil gøre det pænere
+// og mere overskuligt
+
 void ConsoleInputProvider::initialize()
 {
     // Ingen initialisering nødvendig for console input
@@ -11,10 +15,10 @@ void ConsoleInputProvider::shutdown()
     // Ingen oprydning nødvendig for console input
 }
 
-int ConsoleInputProvider::getSpellInput(const std::string &playerName)
+SpellMessage ConsoleInputProvider::getSpellInput(const std::string &playerName)
 {
-    int input;
-    std::cout << "Indtast spell for " << playerName << ": ";
-    std::cin >> input;
-    return input;
+    std::string spellName;
+    std::cout << "Indtast spell navn for " << playerName << " (Fireball/Lightning/Shield/Heal): ";
+    std::cin >> spellName;
+    return SpellMessage{playerName, spellName};
 }
