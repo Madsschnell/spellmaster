@@ -66,6 +66,15 @@ void Player::spendMana(int amount)
     }
 }
 
+void Player::regenerateMana(int amount)
+{
+    mana += amount;
+    if (mana > 50)
+    {
+        mana = 50;
+    }
+}
+
 bool Player::isAlive() const
 {
     return hp > 0;

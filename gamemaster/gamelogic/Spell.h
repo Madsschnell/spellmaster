@@ -18,8 +18,8 @@ struct Spell
     int manaCost;
     int healAmount;
     bool isDefensive;
+    std::string description = "";
 
-    // Factory methods for creating spells
     static Spell Miss();
     static Spell Fireball();
     static Spell Lightning();
