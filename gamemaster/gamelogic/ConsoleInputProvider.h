@@ -1,6 +1,6 @@
 #pragma once
-#include "InputProvider.hpp"
-#include "SpellMessage.hpp"
+#include "InputProvider.h"
+#include "SpellMessage.h"
 
 // Mock implementation der bruger std::cin
 // Erstattes senere med ZeroMQ eller MQTT implementation

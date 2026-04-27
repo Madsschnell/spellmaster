@@ -1,6 +1,6 @@
 #pragma once
-#include "InputProvider.hpp"
-#include "SpellMessage.hpp"
+#include "InputProvider.h"
+#include "SpellMessage.h"
 #include <zmq.hpp>
 #include <string>
 #include <memory>

@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "SpellMessage.hpp"
+#include "SpellMessage.h"
 
 // Interface for input providers
 // Gør det nemt at skifte mellem mock (std::cin) og rigtig netværkskommunikation (ZeroMQ/MQTT)

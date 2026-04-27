@@ -1,9 +1,9 @@
 #pragma once
-#include "Player.hpp"
-#include "Spell.hpp"
-#include "InputProvider.hpp"
-#include "SpellMessage.hpp"
-#include "GameStatus.hpp"
+#include "Player.h"
+#include "Spell.h"
+#include "InputProvider.h"
+#include "SpellMessage.h"
+#include "GameStatus.h"
 #include <iostream>
 #include <string>
 #include <memory>

@@ -1,4 +1,4 @@
-#include "Player.hpp"
+#include "Player.h"
 #include <iostream>
 
 // Initialiserer spilleren med de værdier, GameMasteren giver os

@@ -1,4 +1,4 @@
-#include "Spell.hpp"
+#include "Spell.h"
 
 Spell Spell::Miss()
 {

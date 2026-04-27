@@ -1,5 +1,5 @@
-#include "GameMaster.hpp"
-#include "ZeroMQInputProvider.hpp"
+#include "GameMaster.h"
+#include "ZeroMQInputProvider.h"
 #include <memory>
 
 int main()

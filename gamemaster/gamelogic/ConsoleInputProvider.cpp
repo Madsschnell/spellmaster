@@ -1,4 +1,4 @@
-#include "ConsoleInputProvider.hpp"
+#include "ConsoleInputProvider.h"
 #include <iostream>
 
 // skal nok slettes, skal bruge zeroQT til selve spillet

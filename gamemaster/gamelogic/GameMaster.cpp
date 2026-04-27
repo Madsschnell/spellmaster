@@ -1,5 +1,5 @@
-#include "GameMaster.hpp"
-#include "ConsoleInputProvider.hpp"
+#include "GameMaster.h"
+#include "ConsoleInputProvider.h"
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <chrono>

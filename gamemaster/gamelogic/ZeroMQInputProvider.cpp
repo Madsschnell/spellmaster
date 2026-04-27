@@ -1,4 +1,4 @@
-#include "ZeroMQInputProvider.hpp"
+#include "ZeroMQInputProvider.h"
 #include <iostream>
 
 ZeroMQInputProvider::ZeroMQInputProvider(zmq::context_t &sharedContext)
