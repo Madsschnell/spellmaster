@@ -1,0 +1,34 @@
+{
+    "Fireball": {
+        "id": 1,
+        "manaCost": 10,
+        "damage": 20,
+        "heal": 0,
+        "defensive": false,
+        "description": "Skyder en ildkugle mod modstanderen"
+    },
+    "Lightning": {
+        "id": 2,
+        "manaCost": 20,
+        "damage": 30,
+        "heal": 0,
+        "defensive": false,
+        "description": "Rammer modstanderen med et lyn"
+    },
+    "Shield": {
+        "id": 3,
+        "manaCost": 15,
+        "damage": 0,
+        "heal": 0,
+        "defensive": true,
+        "description": "Halverer skaden fra næste angreb"
+    },
+    "Heal": {
+        "id": 4,
+        "manaCost": 25,
+        "damage": 0,
+        "heal": 30,
+        "defensive": false,
+        "description": "Gendanner 30 HP"
+    }
+}
