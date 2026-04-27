@@ -29,12 +29,6 @@ bool GameLogic::loadSpells(const std::string& path)
         s.isDefensive = data["defensive"];
         s.description = data["description"];
 
-        if (name == "Fireball")       s.type = SpellType::Fireball;
-        else if (name == "Lightning") s.type = SpellType::Lightning;
-        else if (name == "Shield")    s.type = SpellType::Shield;
-        else if (name == "Heal")      s.type = SpellType::Heal;
-        else                          s.type = SpellType::Miss;
-
         spells[name] = s;
     }
 

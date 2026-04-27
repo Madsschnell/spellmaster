@@ -1,12 +1,21 @@
 #pragma once
 #include "Player.h"
-#include "Spell.h"
 #include "gamestatus.h"
 #include "spellmessage.h"
 #include "playeraction.h"
 #include <nlohmann/json.hpp>
 #include <string>
 #include <map>
+
+// Spell data loaded from spells.json at startup
+struct Spell {
+    std::string name;
+    int damage;
+    int manaCost;
+    int healAmount;
+    bool isDefensive;
+    std::string description;
+};
 
 class GameLogic {
     GamePhase phase = GamePhase::LOBBY;

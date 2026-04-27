@@ -13,7 +13,6 @@ enum class Spell
     METEOR,    // star
     SLASH,     // line
     HEAL,      // spiral
-    BOTCHED    // failed / not recognised / timeout
 };
 
 inline std::string spellToString(Spell s)
@@ -34,10 +33,8 @@ inline std::string spellToString(Spell s)
         return "SLASH (Line)";
     case Spell::HEAL:
         return "HEAL (Spiral)";
-    case Spell::BOTCHED:
-        return "BOTCHED (Failed Spell)";
     default:
-        return "NO SPELL";
+        return "Unknown gesture";
     }
 }
 
