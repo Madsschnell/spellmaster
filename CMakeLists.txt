@@ -10,7 +10,7 @@ if(NOT nlohmann_json_FOUND)
     include(FetchContent)
     FetchContent_Declare(
         nlohmann_json
-        URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
+        URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz
     )
     FetchContent_MakeAvailable(nlohmann_json)
 endif()
@@ -21,7 +21,7 @@ if(NOT cppzmq_FOUND)
     include(FetchContent)
     FetchContent_Declare(
         cppzmq
-        URL https://github.com/zeromq/cppzmq/archive/refs/tags/v4.10.0.tar.gz
+        URL https://github.com/zeromq/cppzmq/archive/refs/tags/v4.11.0.tar.gz
     )
     FetchContent_MakeAvailable(cppzmq)
 endif()

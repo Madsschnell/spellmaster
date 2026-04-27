@@ -84,3 +84,19 @@ bool zmq_pull_raw(zmq::socket_t &socket, T &out)
 
     return json_from_string<T>(msg.to_string(), out);
 }
+
+/**
+ * Receive one JSON frame without deserializing.
+ * Used by GameMaster to inspect message type before dispatch
+ * (PULL socket receives both SpellMessage and PlayerAction).
+ */
+inline bool zmq_pull_raw(zmq::socket_t &socket, json &out)
+{
+    zmq::message_t msg;
+    auto result = socket.recv(msg, zmq::recv_flags::dontwait);
+    if (!result)
+        return false;
+
+    out = json::parse(msg.to_string());
+    return true;
+}
