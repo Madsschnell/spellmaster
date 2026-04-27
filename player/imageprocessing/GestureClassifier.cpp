@@ -1,4 +1,4 @@
-#include "gesture_classifier.hpp"
+#include "GestureClassifier.h"
 #include <cmath>
 #include <algorithm>
 

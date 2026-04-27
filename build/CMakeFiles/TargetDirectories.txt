@@ -1,3 +1,0 @@
-/home/au768175/Spellmaster/Test1/spellmaster/build/CMakeFiles/spellmaster.dir
-/home/au768175/Spellmaster/Test1/spellmaster/build/CMakeFiles/edit_cache.dir
-/home/au768175/Spellmaster/Test1/spellmaster/build/CMakeFiles/rebuild_cache.dir
