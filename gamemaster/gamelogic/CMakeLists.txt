@@ -6,7 +6,6 @@ add_executable(gamemaster
     main.cpp
     GameLogic.cpp
     Player.cpp
-    Spell.cpp
 )
 
 target_include_directories(gamemaster PRIVATE ${ZMQ_INCLUDE_DIRS})
