@@ -22,6 +22,7 @@ public:
     void takeDamage(int amount);
     void heal(int amount);
     void spendMana(int amount);
+    void regenerateMana(int amount);
     bool isAlive() const;
     void setShield(bool active); // activere/deactivere
     bool activeShield() const;   // tjekker tilstand

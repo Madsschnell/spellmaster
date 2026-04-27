@@ -45,5 +45,5 @@ endif()
 
 # Gamemaster-komponenter (GameLogic)
 if(EXISTS ${CMAKE_SOURCE_DIR}/gamemaster)
-    # add_subdirectory(gamemaster/gamelogic)  # aktiveres når koden er klar
+    add_subdirectory(gamemaster/gamelogic)
 endif()

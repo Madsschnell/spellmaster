@@ -1,4 +1,4 @@
-#include "Player.hpp"
+#include "Player.h"
 #include <iostream>
 
 // Initialiserer spilleren med de værdier, GameMasteren giver os
@@ -63,6 +63,15 @@ void Player::spendMana(int amount)
     if (mana < 0)
     {
         mana = 0;
+    }
+}
+
+void Player::regenerateMana(int amount)
+{
+    mana += amount;
+    if (mana > 50)
+    {
+        mana = 50;
     }
 }
 
