@@ -40,7 +40,7 @@ include_directories(${CMAKE_SOURCE_DIR}/common)
 # Player-komponenter (UI + ImageProcessing)
 if(EXISTS ${CMAKE_SOURCE_DIR}/player)
     add_subdirectory(player/ui)
-    # add_subdirectory(player/imageprocessing)  # aktiveres når koden er klar
+    add_subdirectory(player)
 endif()
 
 # Gamemaster-komponenter (GameLogic)
