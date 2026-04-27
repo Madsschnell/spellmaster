@@ -1,19 +1,49 @@
-cmake_minimum_required(VERSION 3.10)
-project(spellmaster)
+cmake_minimum_required(VERSION 3.16)
+project(SpellMaster LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Helps VS Code / clangd / IntelliSense discover include paths.
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+# nlohmann_json
+find_package(nlohmann_json CONFIG QUIET)
+if(NOT nlohmann_json_FOUND)
+    include(FetchContent)
+    FetchContent_Declare(
+        nlohmann_json
+        URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz
+    )
+    FetchContent_MakeAvailable(nlohmann_json)
+endif()
 
-find_package(OpenCV REQUIRED)
+# cppzmq (zmq.hpp)
+find_package(cppzmq CONFIG QUIET)
+if(NOT cppzmq_FOUND)
+    include(FetchContent)
+    FetchContent_Declare(
+        cppzmq
+        URL https://github.com/zeromq/cppzmq/archive/refs/tags/v4.11.0.tar.gz
+    )
+    FetchContent_MakeAvailable(cppzmq)
+endif()
 
-add_executable(spellmaster
-    main.cpp
-    gesture_classifier.cpp
-)
+# Make zmq.hpp include path available globally, matching current include_directories style.
+if(TARGET cppzmq)
+    get_target_property(CPPZMQ_INCLUDE_DIRS cppzmq INTERFACE_INCLUDE_DIRECTORIES)
+    if(CPPZMQ_INCLUDE_DIRS)
+        include_directories(${CPPZMQ_INCLUDE_DIRS})
+    endif()
+endif()
 
-target_include_directories(spellmaster PRIVATE ${OpenCV_INCLUDE_DIRS})
+# Delte headers (gamestatus.h, spellmessage.h, serialization.h, transport.h)
+include_directories(${CMAKE_SOURCE_DIR}/common)
 
-target_link_libraries(spellmaster PRIVATE ${OpenCV_LIBS})
+# Player-komponenter (UI + ImageProcessing)
+if(EXISTS ${CMAKE_SOURCE_DIR}/player)
+    add_subdirectory(player/ui)
+    add_subdirectory(player)
+endif()
+
+# Gamemaster-komponenter (GameLogic)
+if(EXISTS ${CMAKE_SOURCE_DIR}/gamemaster)
+    add_subdirectory(gamemaster/gamelogic)
+endif()
