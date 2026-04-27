@@ -1,5 +1,5 @@
-#ifndef SPELLS_HPP
-#define SPELLS_HPP
+#ifndef SPELLS_H
+#define SPELLS_H
 
 #include <string>
 
@@ -41,4 +41,4 @@ inline std::string spellToString(Spell s)
     }
 }
 
-#endif // SPELLS_HPP
+#endif // SPELLS_H
