@@ -1,7 +1,6 @@
 #include "GameLogic.h"
 #include <fstream>
 #include <iostream>
-#include <algorithm>
 
 GameLogic::GameLogic()
     : player1("Player 1", 100, 50)

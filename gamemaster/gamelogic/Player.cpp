@@ -1,5 +1,4 @@
 #include "Player.h"
-#include <iostream>
 
 // Initialiserer spilleren med de værdier, GameMasteren giver os
 Player::Player(std::string playerName, int startingHp, int startingMana)
@@ -20,26 +19,8 @@ int Player::getMana() const
     return mana;
 }
 
-void Player::setShield(bool active)
-{
-    shieldUp = active;
-}
-
-bool Player::activeShield() const
-{
-    return shieldUp;
-}
-
 void Player::takeDamage(int amount)
 {
-
-    if (shieldUp)
-    {
-        std::cout << name << " blokerede halvdelen af angrebet med sit shield!" << std::endl;
-        amount /= 2; // Halverer skaden
-        shieldUp = false;
-    }
-
     hp -= amount;
     if (hp < 0)
     {
@@ -50,7 +31,6 @@ void Player::takeDamage(int amount)
 void Player::heal(int amount)
 {
     hp += amount;
-
     if (hp > 100)
     {
         hp = 100; // sørger for man ikke kan få mere liv end man startede med

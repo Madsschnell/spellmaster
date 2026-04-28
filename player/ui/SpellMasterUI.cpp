@@ -1,7 +1,5 @@
 #include "SpellMasterUI.h"
 #include <QApplication>
-#include <QGridLayout>
-#include <QFrame>
 
 // StatBar
 
@@ -151,6 +149,12 @@ SpellMasterUI::SpellMasterUI(const QString &windowTitle)
     screens->addWidget(createBattleScreen());
     screens->addWidget(createResultScreen());
     screens->setCurrentIndex(LOBBY);
+
+    auto *versionLabel = new QLabel(UI_VERSION, this);
+    versionLabel->setStyleSheet("color: #444444; font-size: 10px;");
+    versionLabel->setGeometry(700, 460, 90, 15);
+    versionLabel->setAlignment(Qt::AlignRight);
+    versionLabel->raise();
 
     recognitionTimer = new QTimer(this);
     recognitionTimer->setSingleShot(true);
@@ -305,6 +309,7 @@ QWidget* SpellMasterUI::createLobbyScreen()
     layout->addSpacing(10);
     layout->addWidget(lobbyStatus);
     layout->addStretch();
+
     return screen;
 }
 
