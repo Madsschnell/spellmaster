@@ -170,7 +170,7 @@ inline void from_json(const json &j, PlayerAction &pa)
 }
 
 /// @name JSON string helpers for ZeroMQ payloads
-/// @{
+///@{
 
 /// Serialize a typed object to a JSON string
 /// @tparam T Type with nlohmann to_json support
@@ -213,3 +213,5 @@ inline bool json_from_string(const std::string &payload, T &out)
         return false;
     }
 }
+
+///@}

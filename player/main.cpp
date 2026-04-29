@@ -44,6 +44,7 @@
 #include <memory>
 #include <functional>
 
+/// Player application: connects UI, ImageProcessing, and ZeroMQ networking
 class PlayerApp : public QObject {
     std::string playerId;
     SpellMasterUI *ui;
