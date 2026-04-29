@@ -1,13 +1,7 @@
 // ImageProcessing.h
 // Camera-based gesture recognition using rpicam-vid and OpenCV.
-//
 // Runs in its own thread with own ZeroMQ sockets (SUB + PUSH).
-// Captures IR wand input, accumulates drawing path, classifies gesture,
-// and sends SpellMessage to GameMaster when a valid spell is recognized.
-// Communicates with UI via onRecognitionResult callback (QueuedConnection).
-//
-// Based on IR detection and gesture tracking from Test3 branch,
-// adapted to SpellMaster's threaded component architecture.
+// Communicates with UI via onRecognitionResult callback.
 
 #pragma once
 
@@ -25,6 +19,9 @@
 #include <thread>
 #include <atomic>
 
+/// IR wand tracking and gesture recognition via rpicam-vid.
+/// Captures frames, detects IR point, accumulates drawing path,
+/// classifies gesture, and sends SpellMessage to GameMaster.
 class ImageProcessing {
     // Camera settings
     static constexpr int CAP_W = 640;
@@ -36,7 +33,7 @@ class ImageProcessing {
     static constexpr double MIN_AREA = 20.0;
     static constexpr double MAX_AREA = 8000.0;
 
-    // Timing
+    // Debounce: minimum gap before pen-up is registered
     static constexpr double DRAW_END_GAP_SEC = 0.25;
 
     std::string playerId;
@@ -47,12 +44,22 @@ class ImageProcessing {
     std::thread workerThread;
 
 public:
+    /// Called when a gesture is recognized or rejected.
+    /// @param success true if a valid spell was cast, false for error/unsupported
+    /// @param message Description for UI display (e.g. "Spell: Fireball")
     std::function<void(bool success, const std::string& message)> onRecognitionResult;
 
+    /// @param id Player ID ("player1" or "player2")
+    /// @param ip GameMaster IP address for ZeroMQ connections
     ImageProcessing(const std::string& id, const std::string& ip);
     ~ImageProcessing();
 
+    /// Start camera capture and tracking in a background thread
     void start();
+
+    /// Enable MJPEG debug stream on port 8080.
+    /// When enabled, every 3rd frame is sent as JPEG with IR overlay.
+    /// @param enable true to start debug server
     void setDebugStream(bool enable);
 
 private:
@@ -61,10 +68,28 @@ private:
     int debugClient = -1;
 
     void run();
+
+    /// Detect brightest IR point in a grayscale frame (Y channel)
+    /// @param gray Grayscale image (direct Y channel from YUV420)
+    /// @return Centroid of brightest IR blob, or (-1,-1) if none found
     cv::Point detectIR(const cv::Mat& gray);
+
+    /// Map gesture classifier output to game spell name
+    /// @param gesture Classified gesture type
+    /// @return Spell name for GameMaster (e.g. "Fireball"), or empty if unsupported
     std::string mapToGameSpell(Spell gesture);
+
+    /// Draw debug overlay with IR crosshair, gesture path, and phase indicator
+    /// @param bgr BGR frame for drawing on
+    /// @param tip Current IR point position
+    /// @param gesture Accumulated gesture path
+    /// @return BGR frame with overlay drawn
     cv::Mat drawDebugOverlay(const cv::Mat& bgr, const cv::Point& tip,
                              const std::vector<cv::Point>& gesture);
+
     void startDebugServer();
+
+    /// Encode frame as JPEG and send to connected debug viewer
+    /// @param frame BGR frame to send
     void sendDebugFrame(const cv::Mat& frame);
 };

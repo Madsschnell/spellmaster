@@ -1,13 +1,7 @@
 // ImageProcessingStub.h
-// Keyboard-based stub for testing without camera
-//
+// Keyboard-based stub for testing without camera.
 // Runs in its own thread with own ZeroMQ sockets (SUB + PUSH).
-// Communicates with UI via onRecognitionResult callback (QueuedConnection).
-//
-// The real ImageProcessing will have the same threading model:
-//   - Own thread for camera capture and pattern recognition
-//   - Own ZeroMQ sockets (SUB for GameStatus, PUSH for spells)
-//   - onRecognitionResult callback marshalled to Qt thread
+// Same threading model as the real ImageProcessing.
 
 #pragma once
 
@@ -23,6 +17,9 @@
 #include <atomic>
 #include <cstdlib>
 
+/// Keyboard-based ImageProcessing stub for desktop testing.
+/// Keys 1-4 cast spells, key 5 simulates an unrecognized gesture.
+/// In auto mode, casts a random spell each round without keyboard input.
 class ImageProcessingStub {
     std::string playerId;
     bool autoMode;
@@ -35,8 +32,14 @@ class ImageProcessingStub {
     std::thread workerThread;
 
 public:
+    /// Called when a spell is cast or rejected (for UI feedback)
+    /// @param success true if spell was cast, false for error
+    /// @param message Description for UI display
     std::function<void(bool success, const std::string& message)> onRecognitionResult;
 
+    /// @param id Player ID ("player1" or "player2")
+    /// @param ip GameMaster IP address
+    /// @param autocast If true, cast random spells automatically
     ImageProcessingStub(const std::string& id, const std::string& ip, bool autocast)
         : playerId(id), autoMode(autocast), serverIp(ip) {}
 
@@ -46,11 +49,14 @@ public:
         if (workerThread.joinable()) workerThread.join();
     }
 
+    /// Start polling in a background thread
     void start()
     {
         workerThread = std::thread(&ImageProcessingStub::run, this);
     }
 
+    /// Queue a key press for processing in the worker thread
+    /// @param key Spell key (1=Fireball, 2=Lightning, 3=Shield, 4=Heal, 5=error)
     void onKeyPress(int key)
     {
         pendingKeyPress.store(key);
