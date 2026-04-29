@@ -1,8 +1,7 @@
 // Spells.h
 // Gesture classification output types and display names
 
-#ifndef SPELLS_H
-#define SPELLS_H
+#pragma once
 
 #include <string>
 
@@ -45,5 +44,3 @@ inline std::string spellToString(Spell s)
         return "Unknown gesture";
     }
 }
-
-#endif // SPELLS_H
