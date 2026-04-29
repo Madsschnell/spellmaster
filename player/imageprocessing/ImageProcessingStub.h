@@ -11,10 +11,10 @@
 
 #pragma once
 
-#include "gamestatus.h"
-#include "spellmessage.h"
-#include "serialization.h"
-#include "transport.h"
+#include "GameStatus.h"
+#include "SpellMessage.h"
+#include "Serialization.h"
+#include "Transport.h"
 #include <zmq.hpp>
 #include <iostream>
 #include <string>

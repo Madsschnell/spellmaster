@@ -1,6 +1,6 @@
 #include "GameLogic.h"
-#include "serialization.h"
-#include "transport.h"
+#include "Serialization.h"
+#include "Transport.h"
 #include <zmq.hpp>
 #include <nlohmann/json.hpp>
 #include <iostream>
