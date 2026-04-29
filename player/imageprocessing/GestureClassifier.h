@@ -1,8 +1,7 @@
 // GestureClassifier.h
 // Pattern matching for IR wand gestures drawn in the air
 
-#ifndef GESTURE_CLASSIFIER_H
-#define GESTURE_CLASSIFIER_H
+#pragma once
 
 #include <vector>
 #include <opencv2/opencv.hpp>
@@ -14,5 +13,3 @@
 /// @param frameSize Camera frame dimensions (for normalization)
 /// @return Recognized gesture type, or Spell::NONE if unrecognized
 Spell classifyGesture(const std::vector<cv::Point> &pts, const cv::Size &frameSize);
-
-#endif // GESTURE_CLASSIFIER_H
