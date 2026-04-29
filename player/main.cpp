@@ -28,10 +28,10 @@
 #include "ui/SpellMasterUI.h"
 #include "imageprocessing/ImageProcessingStub.h"
 #include "imageprocessing/ImageProcessing.h"
-#include "gamestatus.h"
-#include "playeraction.h"
-#include "serialization.h"
-#include "transport.h"
+#include "GameStatus.h"
+#include "PlayerAction.h"
+#include "Serialization.h"
+#include "Transport.h"
 #include <QApplication>
 #include <QTimer>
 #include <QKeyEvent>

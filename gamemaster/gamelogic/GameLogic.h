@@ -1,8 +1,8 @@
 #pragma once
 #include "Player.h"
-#include "gamestatus.h"
-#include "spellmessage.h"
-#include "playeraction.h"
+#include "GameStatus.h"
+#include "SpellMessage.h"
+#include "PlayerAction.h"
 #include <nlohmann/json.hpp>
 #include <string>
 #include <map>

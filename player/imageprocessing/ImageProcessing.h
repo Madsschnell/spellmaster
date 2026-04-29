@@ -13,10 +13,10 @@
 
 #include "Spells.h"
 #include "GestureClassifier.h"
-#include "gamestatus.h"
-#include "spellmessage.h"
-#include "serialization.h"
-#include "transport.h"
+#include "GameStatus.h"
+#include "SpellMessage.h"
+#include "Serialization.h"
+#include "Transport.h"
 #include <opencv2/opencv.hpp>
 #include <zmq.hpp>
 #include <string>

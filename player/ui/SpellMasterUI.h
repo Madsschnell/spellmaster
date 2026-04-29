@@ -12,7 +12,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QTimer>
-#include "gamestatus.h"
+#include "GameStatus.h"
 #include <functional>
 #include <string>
 
