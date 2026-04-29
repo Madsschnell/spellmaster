@@ -1,3 +1,6 @@
+// Serialization.h
+// JSON serialization for all shared types using nlohmann/json
+
 #pragma once
 #include "GameStatus.h"
 #include "SpellMessage.h"
@@ -166,7 +169,13 @@ inline void from_json(const json &j, PlayerAction &pa)
     j.at("action").get_to(pa.action);
 }
 
-// Typed JSON string helpers for ZeroMQ payloads.
+/// @name JSON string helpers for ZeroMQ payloads
+/// @{
+
+/// Serialize a typed object to a JSON string
+/// @tparam T Type with nlohmann to_json support
+/// @param data Object to serialize
+/// @return JSON string representation
 template <typename T>
 inline std::string json_to_string(const T &data)
 {
@@ -174,6 +183,11 @@ inline std::string json_to_string(const T &data)
     return j.dump();
 }
 
+/// Deserialize a JSON string into a typed object
+/// @tparam T Type with nlohmann from_json support
+/// @param payload JSON string to parse
+/// @return Deserialized object
+/// @throws json::exception on parse or type error
 template <typename T>
 inline T json_from_string(const std::string &payload)
 {
@@ -181,6 +195,11 @@ inline T json_from_string(const std::string &payload)
     return j.get<T>();
 }
 
+/// Deserialize a JSON string into a typed object (non-throwing)
+/// @tparam T Type with nlohmann from_json support
+/// @param payload JSON string to parse
+/// @param[out] out Deserialized object on success
+/// @return true if parsing succeeded, false otherwise
 template <typename T>
 inline bool json_from_string(const std::string &payload, T &out)
 {

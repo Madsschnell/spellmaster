@@ -1,20 +1,28 @@
+// Spells.h
+// Gesture classification output types and display names
+
 #ifndef SPELLS_H
 #define SPELLS_H
 
 #include <string>
 
+/// Gesture types recognized by GestureClassifier.
+/// Each value maps to a drawn shape detected by IR tracking.
 enum class Spell
 {
-    NONE = 0,
-    FIREBALL,  // circle
-    SHIELD,    // square
-    LIGHTNING, // zig-zag
-    SUMMON,    // triangle
-    METEOR,    // star
-    SLASH,     // line
-    HEAL,      // spiral
+    NONE = 0,   ///< Not recognized or too short
+    FIREBALL,   ///< Circle gesture
+    SHIELD,     ///< Square gesture
+    LIGHTNING,  ///< Zig-zag gesture
+    SUMMON,     ///< Triangle gesture
+    METEOR,     ///< Star gesture
+    SLASH,      ///< Line gesture
+    HEAL,       ///< Spiral gesture
 };
 
+/// Convert gesture type to human-readable string for UI feedback
+/// @param s Gesture type from classifier
+/// @return Display string including shape name, e.g. "FIREBALL (Circle)"
 inline std::string spellToString(Spell s)
 {
     switch (s)
