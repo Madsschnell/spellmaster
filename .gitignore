@@ -2,6 +2,9 @@
 build/
 cmake-build-*/
 
+# Doxygen output
+docs/
+
 # Compiled binaries
 *.o
 *.out
