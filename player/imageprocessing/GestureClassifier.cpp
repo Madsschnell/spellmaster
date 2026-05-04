@@ -225,14 +225,14 @@ Spell classifyGesture(const std::vector<cv::Point> &pts, const cv::Size &frameSi
     if (isStarLike(pts))
         return Spell::METEOR;
 
+    if (isSpiralLike(pts))
+        return Spell::HEAL;
+
     if (isZigZagLike(pts))
         return Spell::LIGHTNING;
 
     if (isLineLike(pts))
         return Spell::SLASH;
-
-    if (isSpiralLike(pts))
-        return Spell::HEAL;
 
     return Spell::NONE;
 }
