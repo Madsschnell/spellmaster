@@ -65,6 +65,11 @@ static bool isCircleLike(const std::vector<cv::Point> &pts)
     if (pts.size() < 20)
         return false;
 
+    // Reject shapes with sharp corners (circles have none)
+    int corners = countCorners(pts, 45.0);
+    if (corners >= 3)
+        return false;
+
     cv::Point2f center;
     float radius;
     cv::minEnclosingCircle(pts, center, radius);
