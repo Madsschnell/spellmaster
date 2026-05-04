@@ -40,7 +40,7 @@ static int countCorners(const std::vector<cv::Point> &pts, double angleThreshDeg
 
     std::vector<cv::Point2f> simplified;
     simplified.reserve(pts.size() / 2 + 1);
-    for (size_t i = 0; i < pts.size(); i += 2)
+    for (size_t i = 0; i < pts.size(); i += 4)
         simplified.push_back(pts[i]);
 
     int corners = 0;
@@ -65,8 +65,7 @@ static bool isCircleLike(const std::vector<cv::Point> &pts)
     if (pts.size() < 20)
         return false;
 
-    // Reject shapes with sharp corners (circles have none)
-    int corners = countCorners(pts, 45.0);
+    int corners = countCorners(pts, 35.0);
     if (corners >= 3)
         return false;
 
