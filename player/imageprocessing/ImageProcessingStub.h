@@ -89,6 +89,11 @@ private:
                     spellCastThisRound.store(false);
                 }
 
+                // Allow retry if spell was rejected by GameMaster
+                if (!gs.spellRejected.empty() && spellCastThisRound.load()) {
+                    spellCastThisRound.store(false);
+                }
+
                 if (autoMode && gs.phase == GamePhase::CASTING && !spellCastThisRound.load()) {
                     if (gs.castTimeLeft <= 7) {
                         static const char* spells[] = {"Fireball", "Lightning", "Shield", "Heal", "Drain"};

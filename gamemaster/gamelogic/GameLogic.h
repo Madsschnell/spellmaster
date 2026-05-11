@@ -41,6 +41,9 @@ class GameLogic {
     bool p1Shielded = false;
     bool p2Shielded = false;
 
+    std::string p1SpellRejected;
+    std::string p2SpellRejected;
+
     std::string winner;
     std::map<std::string, Spell> spells;
 

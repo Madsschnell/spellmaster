@@ -232,6 +232,10 @@ void SpellMasterUI::updateDisplay(const GameStatus &gs)
             status.phase != GamePhase::RESOLVING,
             status.phase == GamePhase::RESOLVING ? status.opponentEffect : EffectInfo{});
         messageLabel->setText(QString::fromStdString(status.statusMessage));
+
+        if (status.phase == GamePhase::CASTING && !status.spellRejected.empty())
+            showRecognitionResult(false, status.spellRejected);
+
         screens->setCurrentIndex(BATTLE);
         break;
 

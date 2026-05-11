@@ -53,4 +53,5 @@ struct GameStatus {
     EffectInfo opponentEffect;   ///< Effect shown on opponent panel
     std::string winner = "";     ///< Empty until GAME_OVER
     std::string statusMessage = "Waiting for players...";
+    std::string spellRejected = ""; ///< Non-empty if spell was rejected (e.g. not enough mana)
 };
