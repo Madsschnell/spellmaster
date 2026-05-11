@@ -138,7 +138,8 @@ Tastatur (stub mode):
 | 2 | Lightning |
 | 3 | Shield |
 | 4 | Heal |
-| 5 | Ukendt gesture (test af fejlvisning) |
+| 5 | Drain |
+| 6 | Ukendt gesture (test af fejlvisning) |
 | Space | READY |
 | Esc | Afslut |
 
