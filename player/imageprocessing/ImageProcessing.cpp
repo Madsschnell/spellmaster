@@ -212,6 +212,9 @@ void ImageProcessing::run()
         " --height " + std::to_string(CAP_H) +
         " --framerate " + std::to_string(FRAMERATE) +
         " --codec yuv420"
+        " --shutter 5000"
+        " --gain 1.0"
+        " --awbgains 1.0,1.0"
         " --output -"
         " --timeout 0"
         " --nopreview"
