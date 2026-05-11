@@ -129,7 +129,7 @@ inline void from_json(const json &j, EffectInfo &e)
 inline void to_json(json &j, const GameStatus &gs)
 {
     j = json{
-        {"phase", gs.phase}, {"round", gs.round}, {"castTimeLeft", gs.castTimeLeft}, {"self", gs.self}, {"opponent", gs.opponent}, {"selfEffect", gs.selfEffect}, {"opponentEffect", gs.opponentEffect}, {"winner", gs.winner}, {"statusMessage", gs.statusMessage}};
+        {"phase", gs.phase}, {"round", gs.round}, {"castTimeLeft", gs.castTimeLeft}, {"self", gs.self}, {"opponent", gs.opponent}, {"selfEffect", gs.selfEffect}, {"opponentEffect", gs.opponentEffect}, {"winner", gs.winner}, {"statusMessage", gs.statusMessage}, {"spellRejected", gs.spellRejected}};
 }
 
 inline void from_json(const json &j, GameStatus &gs)
@@ -143,6 +143,7 @@ inline void from_json(const json &j, GameStatus &gs)
     j.at("opponentEffect").get_to(gs.opponentEffect);
     j.at("winner").get_to(gs.winner);
     j.at("statusMessage").get_to(gs.statusMessage);
+    j.at("spellRejected").get_to(gs.spellRejected);
 }
 
 // SpellMessage

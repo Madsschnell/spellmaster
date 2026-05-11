@@ -67,6 +67,8 @@ void GameLogic::onSpellMessage(const SpellMessage& msg)
     if (!castName.empty()) return;
 
     if (caster.getMana() < spell.manaCost) {
+        std::string &rejected = isP1 ? p1SpellRejected : p2SpellRejected;
+        rejected = "Not enough mana for " + spell.name;
         std::cout << caster.getName() << " does not have enough mana for "
                   << spell.name << std::endl;
         return;
@@ -74,6 +76,10 @@ void GameLogic::onSpellMessage(const SpellMessage& msg)
 
     castName = spell.name;
     caster.spendMana(spell.manaCost);
+
+    // Clear any previous rejection now that a spell was accepted
+    std::string &rejected = isP1 ? p1SpellRejected : p2SpellRejected;
+    rejected = "";
 
     if (spell.isDefensive) {
         if (isP1) p1Shielded = true;
@@ -151,11 +157,13 @@ GameStatus GameLogic::getStatusForPlayer(const std::string& playerId)
         gs.opponent = makeInfo(player2, p2SpellName);
         gs.selfEffect = p1Effect;
         gs.opponentEffect = p2Effect;
+        gs.spellRejected = p1SpellRejected;
     } else {
         gs.self = makeInfo(player2, p2SpellName);
         gs.opponent = makeInfo(player1, p1SpellName);
         gs.selfEffect = p2Effect;
         gs.opponentEffect = p1Effect;
+        gs.spellRejected = p2SpellRejected;
     }
 
     gs.statusMessage = getStatusMessage(playerId);
@@ -180,6 +188,8 @@ void GameLogic::startGame()
     p2Ready = false;
     p1Shielded = false;
     p2Shielded = false;
+    p1SpellRejected = "";
+    p2SpellRejected = "";
     winner = "";
     phase = GamePhase::GET_READY;
     castTimeLeft = 5;
@@ -245,6 +255,8 @@ void GameLogic::nextRound()
     p2Effect = {};
     p1Shielded = false;
     p2Shielded = false;
+    p1SpellRejected = "";
+    p2SpellRejected = "";
 
     player1.regenerateMana(10);
     player2.regenerateMana(10);

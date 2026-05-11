@@ -261,6 +261,11 @@ void ImageProcessing::run()
                 gesture.clear();
                 prevPt = {-1, -1};
             }
+
+            // Allow retry if spell was rejected by GameMaster (e.g. not enough mana)
+            if (!gs.spellRejected.empty() && spellCastThisRound.load()) {
+                spellCastThisRound.store(false);
+            }
         }
 
         // Read frame (always, to keep pipe drained)
