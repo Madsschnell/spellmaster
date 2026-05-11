@@ -18,7 +18,7 @@
 #include <cstdlib>
 
 /// Keyboard-based ImageProcessing stub for desktop testing.
-/// Keys 1-4 cast spells, key 5 simulates an unrecognized gesture.
+/// Keys 1-5 cast spells, key 6 simulates an unrecognized gesture.
 /// In auto mode, casts a random spell each round without keyboard input.
 class ImageProcessingStub {
     std::string playerId;
@@ -56,7 +56,7 @@ public:
     }
 
     /// Queue a key press for processing in the worker thread
-    /// @param key Spell key (1=Fireball, 2=Lightning, 3=Shield, 4=Heal, 5=error)
+    /// @param key Spell key (1=Fireball, 2=Lightning, 3=Shield, 4=Heal, 5=Drain, 6=error)
     void onKeyPress(int key)
     {
         pendingKeyPress.store(key);
@@ -91,8 +91,8 @@ private:
 
                 if (autoMode && gs.phase == GamePhase::CASTING && !spellCastThisRound.load()) {
                     if (gs.castTimeLeft <= 7) {
-                        static const char* spells[] = {"Fireball", "Lightning", "Shield", "Heal"};
-                        std::string spellName = spells[rand() % 4];
+                        static const char* spells[] = {"Fireball", "Lightning", "Shield", "Heal", "Drain"};
+                        std::string spellName = spells[rand() % 5];
                         castSpell(sender, spellName);
                         if (onRecognitionResult) onRecognitionResult(true, "Auto-cast: " + spellName);
                     }
@@ -118,7 +118,8 @@ private:
         case 2: spellName = "Lightning"; break;
         case 3: spellName = "Shield"; break;
         case 4: spellName = "Heal"; break;
-        case 5:
+        case 5: spellName = "Drain"; break;
+        case 6:
             if (onRecognitionResult) onRecognitionResult(false, "Unknown gesture");
             return;
         default: return;

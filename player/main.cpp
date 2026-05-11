@@ -21,8 +21,8 @@
 //   --debug      Enable MJPEG debug stream of camera feed on port 8080
 //
 // Keyboard (stub mode):
-//   1 = Fireball, 2 = Lightning, 3 = Shield, 4 = Heal
-//   5 = Unknown gesture (error test)
+//   1 = Fireball, 2 = Lightning, 3 = Shield, 4 = Heal, 5 = Drain
+//   6 = Unknown gesture (error test)
 //   Space = READY, Esc = Quit
 
 #include "ui/SpellMasterUI.h"
@@ -130,6 +130,7 @@ protected:
             case Qt::Key_3: if (stub) stub->onKeyPress(3); return true;
             case Qt::Key_4: if (stub) stub->onKeyPress(4); return true;
             case Qt::Key_5: if (stub) stub->onKeyPress(5); return true;
+            case Qt::Key_6: if (stub) stub->onKeyPress(6); return true;
             case Qt::Key_Space:
                 ui->pressReady();
                 return true;
@@ -173,7 +174,7 @@ int main(int argc, char *argv[])
                   << std::endl;
         std::cerr << "  --debug    Enable MJPEG debug stream on port 8080"
                   << std::endl;
-        std::cerr << "  Keys (stub): 1-4 = cast spell, 5 = error test, Space = ready, Esc = quit"
+        std::cerr << "  Keys (stub): 1-5 = cast spell, 6 = error test, Space = ready, Esc = quit"
                   << std::endl;
         return 1;
     }

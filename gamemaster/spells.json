@@ -1,6 +1,7 @@
 {
-    "Fireball":  { "manaCost": 10, "damage": 20, "heal": 0,  "defensive": false, "description": "20 dmg" },
-    "Lightning": { "manaCost": 20, "damage": 30, "heal": 0,  "defensive": false, "description": "30 dmg" },
-    "Shield":    { "manaCost": 15, "damage": 0,  "heal": 0,  "defensive": true,  "description": "1/2 dmg" },
-    "Heal":      { "manaCost": 25, "damage": 0,  "heal": 30, "defensive": false, "description": "+30 HP" }
+    "Fireball": { "manaCost": 10, "damage": 20, "heal": 0, "defensive": false, "description": "20 dmg" },
+    "Lightning": { "manaCost": 20, "damage": 30, "heal": 0, "defensive": false, "description": "30 dmg" },
+    "Shield":    { "manaCost": 15, "damage": 0,  "heal": 0, "defensive": true,  "description": "1/2 dmg" },
+    "Heal":      { "manaCost": 25, "damage": 0,  "heal": 30, "defensive": false, "description": "+30 HP" },
+    "Drain":     { "manaCost": 30, "damage": 15, "heal": 10, "defensive": false, "description": "15 dmg, +10 HP" }
 }
