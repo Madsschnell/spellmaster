@@ -223,7 +223,7 @@ Spell classifyGesture(const std::vector<cv::Point> &pts, const cv::Size &frameSi
         return Spell::FIREBALL;
 
     if (isTriangleLike(pts))
-        return Spell::SUMMON;
+        return Spell::DRAIN;
 
     if (isSpiralLike(pts))
         return Spell::HEAL;

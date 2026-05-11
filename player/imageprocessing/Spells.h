@@ -13,7 +13,7 @@ enum class Spell
     FIREBALL,   ///< Circle gesture
     SHIELD,     ///< Square gesture
     LIGHTNING,  ///< Zig-zag gesture
-    SUMMON,     ///< Triangle gesture
+    DRAIN,      ///< Triangle gesture
     METEOR,     ///< Star gesture
     SLASH,      ///< Line gesture
     HEAL,       ///< Spiral gesture
@@ -32,8 +32,8 @@ inline std::string spellToString(Spell s)
         return "SHIELD (Square)";
     case Spell::LIGHTNING:
         return "LIGHTNING (Zig-Zag)";
-    case Spell::SUMMON:
-        return "SUMMON (Triangle)";
+    case Spell::DRAIN:
+        return "DRAIN (Triangle)";
     case Spell::METEOR:
         return "METEOR (Star)";
     case Spell::SLASH:

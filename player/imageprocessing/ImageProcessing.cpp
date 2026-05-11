@@ -61,6 +61,7 @@ std::string ImageProcessing::mapToGameSpell(Spell gesture)
     case Spell::LIGHTNING: return "Lightning";
     case Spell::SHIELD:    return "Shield";
     case Spell::HEAL:      return "Heal";
+    case Spell::DRAIN:     return "Drain";
     default:               return "";
     }
 }
