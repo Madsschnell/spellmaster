@@ -40,6 +40,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <chrono>
 #include <string>
 #include <memory>
 #include <functional>
@@ -58,6 +59,8 @@ class PlayerApp : public QObject {
     zmq::socket_t subscriber;
     zmq::socket_t sender;
     QTimer *pollTimer;
+    std::chrono::steady_clock::time_point lastReceived;
+    bool connectionLost = false;
 
     void setupRecognitionCallback(std::function<void(bool, const std::string&)>& callback)
     {
@@ -112,6 +115,7 @@ public:
         pollTimer = new QTimer(this);
         connect(pollTimer, &QTimer::timeout, this, &PlayerApp::poll);
         pollTimer->start(100);
+        lastReceived = std::chrono::steady_clock::now();
 
         ui->installEventFilter(this);
         ui->setFocusPolicy(Qt::StrongFocus);
@@ -145,8 +149,26 @@ private:
     {
         std::string topic;
         GameStatus gs;
+        bool received = false;
         while (zmq_subscribe_recv(subscriber, topic, gs)) {
+            received = true;
             ui->updateDisplay(gs);
+        }
+
+        if (received) {
+            lastReceived = std::chrono::steady_clock::now();
+            if (connectionLost) {
+                connectionLost = false;
+                ui->setConnectionLost(false);
+                std::cout << "Connection restored" << std::endl;
+            }
+        } else {
+            auto elapsed = std::chrono::steady_clock::now() - lastReceived;
+            if (!connectionLost && elapsed > std::chrono::seconds(5)) {
+                connectionLost = true;
+                ui->setConnectionLost(true);
+                std::cout << "Connection lost (no data for 5s)" << std::endl;
+            }
         }
     }
 
