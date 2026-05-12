@@ -16,7 +16,7 @@
 #include <functional>
 #include <string>
 
-static const char* UI_VERSION = "v0.3.0";
+static const char* UI_VERSION = "v0.4.0";
 
 /// HP or Mana bar with label and numeric text
 struct StatBar {
@@ -38,7 +38,6 @@ struct StatBar {
 /// One player's info panel (name, HP, mana, effect, spell)
 struct PlayerPanel {
     QLabel *nameLabel;
-    QLabel *playerIdLabel;
     StatBar hpBar;
     StatBar manaBar;
     QLabel *effectLabel;
@@ -56,6 +55,9 @@ struct PlayerPanel {
     /// @param effect Effect info for coloring and text
     void update(const PlayerInfo &info, const QString &roleLabel,
                 bool hideSpell = false, const EffectInfo &effect = {});
+
+    /// Set effect label color and background
+    void setEffectStyle(const QString &color, const QString &bg);
 };
 
 /// Main game UI with lobby, battle, and result screens.
@@ -78,6 +80,9 @@ class SpellMasterUI : public QWidget {
     QTimer *recognitionTimer;
     QWidget *connectionOverlay;
     QLabel *connectionLabel;
+    QLabel *playerDebugLabel;
+    QTimer *pulseTimer;
+    bool pulseBright = false;
     bool readySent = false;
     GamePhase prevPhase = GamePhase::LOBBY;
     enum Screen { LOBBY = 0, BATTLE = 1, RESULT = 2 };

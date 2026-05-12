@@ -6,26 +6,30 @@
 QWidget* StatBar::create(const QString &name, const QString &barColor)
 {
     auto *container = new QWidget;
+    container->setFixedHeight(36);
+    container->setStyleSheet("background: #111122; border-radius: 4px; border: none;");
     auto *layout = new QHBoxLayout(container);
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(8, 0, 8, 0);
+    layout->setSpacing(6);
 
     auto *label = new QLabel(name);
-    label->setFixedWidth(50);
-    label->setStyleSheet("color: #cccccc; font-size: 14px;");
+    label->setFixedWidth(36);
+    label->setStyleSheet("color: #cccccc; font-size: 18px; font-weight: bold; background: transparent; border: none;");
+    label->setAlignment(Qt::AlignVCenter);
 
     bar = new QProgressBar;
     bar->setRange(0, 100);
     bar->setValue(100);
     bar->setTextVisible(false);
-    bar->setFixedHeight(20);
+    bar->setFixedHeight(18);
     bar->setStyleSheet(
-        "QProgressBar { background: #333333; border: 1px solid #555555; border-radius: 3px; }"
+        "QProgressBar { background: #333333; border: none; border-radius: 3px; }"
         "QProgressBar::chunk { background: " + barColor + "; border-radius: 2px; }"
     );
 
     text = new QLabel("100/100");
-    text->setFixedWidth(80);
-    text->setStyleSheet("color: #cccccc; font-size: 13px;");
+    text->setFixedWidth(70);
+    text->setStyleSheet("color: #cccccc; font-size: 18px; font-weight: bold; background: transparent; border: none;");
     text->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 
     layout->addWidget(label);
@@ -41,45 +45,54 @@ void StatBar::update(int value, int max)
     text->setText(QString("%1/%2").arg(value).arg(max));
 }
 
+void PlayerPanel::setEffectStyle(const QString &color, const QString &bg)
+{
+    effectLabel->setStyleSheet(
+        QString("color: %1; font-size: 42px; font-weight: bold; "
+                "background: %2; border-radius: 4px; border: none;").arg(color, bg));
+}
+
 // PlayerPanel
+// All elements get matching boxes (background: #111122, border-radius: 4px)
+// Panel is the outer frame (background: #1a1a2e, border: 1px solid #333355)
 
 QWidget* PlayerPanel::create(const QString &title)
 {
     auto *panel = new QWidget;
     auto *layout = new QVBoxLayout(panel);
-    layout->setSpacing(8);
+    layout->setSpacing(3);
+    layout->setContentsMargins(4, 4, 4, 4);
 
     nameLabel = new QLabel(title);
-    nameLabel->setStyleSheet("color: white; font-size: 20px; font-weight: bold;");
+    nameLabel->setStyleSheet(
+        "color: white; font-size: 32px; font-weight: bold; "
+        "background: #111122; border-radius: 4px; border: none;"
+    );
     nameLabel->setAlignment(Qt::AlignCenter);
-
-    playerIdLabel = new QLabel("");
-    playerIdLabel->setStyleSheet("color: #555555; font-size: 11px;");
-    playerIdLabel->setAlignment(Qt::AlignCenter);
+    nameLabel->setFixedHeight(38);
 
     effectLabel = new QLabel("");
-    effectLabel->setStyleSheet(
-        "color: #666666; font-size: 22px; font-weight: bold; "
-        "background: #111122; border: 1px solid #222244; border-radius: 6px; padding: 10px;"
-    );
+    setEffectStyle("#666666", "#111122");
     effectLabel->setAlignment(Qt::AlignCenter);
+    effectLabel->setFixedHeight(75);
 
     spellLabel = new QLabel("Spell: ---");
-    spellLabel->setStyleSheet("color: #aaaaaa; font-size: 14px;");
+    spellLabel->setStyleSheet(
+        "color: #aaaaaa; font-size: 24px; font-weight: bold; "
+        "background: #111122; border-radius: 4px; border: none;"
+    );
     spellLabel->setAlignment(Qt::AlignCenter);
+    spellLabel->setFixedHeight(75);
 
     layout->addWidget(nameLabel);
-    layout->addWidget(playerIdLabel);
     layout->addWidget(hpBar.create("HP", "#44bb44"));
     layout->addWidget(manaBar.create("MP", "#4488cc"));
-    layout->addStretch();
     layout->addWidget(effectLabel);
-    layout->addStretch();
     layout->addWidget(spellLabel);
 
     panel->setStyleSheet(
         "background: #1a1a2e; border: 1px solid #333355; "
-        "border-radius: 6px; padding: 10px;"
+        "border-radius: 6px;"
     );
 
     return panel;
@@ -89,7 +102,6 @@ void PlayerPanel::update(const PlayerInfo &info, const QString &roleLabel,
                          bool hideSpell, const EffectInfo &effect)
 {
     nameLabel->setText(roleLabel);
-    playerIdLabel->setText(QString::fromStdString(info.name));
     hpBar.update(info.hp, info.maxHp);
     manaBar.update(info.mana, info.maxMana);
 
@@ -104,31 +116,20 @@ void PlayerPanel::update(const PlayerInfo &info, const QString &roleLabel,
 
     if (effect.type == EffectType::NONE) {
         effectLabel->setText("");
-        effectLabel->setStyleSheet(
-            "color: #666666; font-size: 22px; font-weight: bold; "
-            "background: #111122; border: 1px solid #222244; border-radius: 6px; padding: 10px;"
-        );
+        setEffectStyle("#666666", "#111122");
     } else {
         switch (effect.type) {
         case EffectType::DAMAGE:
-            effectLabel->setStyleSheet(
-                "color: #ff4444; font-size: 22px; font-weight: bold; "
-                "background: #1a0000; border: 1px solid #442222; border-radius: 6px; padding: 10px;");
+            setEffectStyle("#ff4444", "#1a0000");
             break;
         case EffectType::HEAL:
-            effectLabel->setStyleSheet(
-                "color: #44ff44; font-size: 22px; font-weight: bold; "
-                "background: #001a00; border: 1px solid #224422; border-radius: 6px; padding: 10px;");
+            setEffectStyle("#44ff44", "#001a00");
             break;
         case EffectType::SHIELD:
-            effectLabel->setStyleSheet(
-                "color: #44aaff; font-size: 22px; font-weight: bold; "
-                "background: #000a1a; border: 1px solid #224466; border-radius: 6px; padding: 10px;");
+            setEffectStyle("#44aaff", "#000a1a");
             break;
         default:
-            effectLabel->setStyleSheet(
-                "color: #666666; font-size: 22px; font-weight: bold; "
-                "background: #111122; border: 1px solid #222244; border-radius: 6px; padding: 10px;");
+            setEffectStyle("#666666", "#111122");
             break;
         }
         effectLabel->setText(QString::fromStdString(effect.text));
@@ -151,10 +152,16 @@ SpellMasterUI::SpellMasterUI(const QString &windowTitle)
     screens->setCurrentIndex(LOBBY);
 
     auto *versionLabel = new QLabel(UI_VERSION, this);
-    versionLabel->setStyleSheet("color: #444444; font-size: 10px;");
-    versionLabel->setGeometry(700, 460, 90, 15);
-    versionLabel->setAlignment(Qt::AlignRight);
+    versionLabel->setStyleSheet("color: #333333; font-size: 9px;");
+    versionLabel->setGeometry(5, 2, 50, 12);
+    versionLabel->setAlignment(Qt::AlignLeft);
     versionLabel->raise();
+
+    playerDebugLabel = new QLabel("", this);
+    playerDebugLabel->setStyleSheet("color: #333333; font-size: 9px;");
+    playerDebugLabel->setGeometry(55, 2, 120, 12);
+    playerDebugLabel->setAlignment(Qt::AlignLeft);
+    playerDebugLabel->raise();
 
     connectionOverlay = new QWidget(this);
     connectionOverlay->setGeometry(0, 0, 800, 480);
@@ -172,7 +179,23 @@ SpellMasterUI::SpellMasterUI(const QString &windowTitle)
     recognitionTimer->setSingleShot(true);
     QObject::connect(recognitionTimer, &QTimer::timeout, [this]() {
         recognitionLabel->setText("");
-        recognitionLabel->setStyleSheet("font-size: 11px;");
+        recognitionLabel->setStyleSheet("font-size: 28px;");
+    });
+
+    pulseTimer = new QTimer(this);
+    QObject::connect(pulseTimer, &QTimer::timeout, [this]() {
+        pulseBright = !pulseBright;
+        if (pulseBright) {
+            messageLabel->setStyleSheet(
+                "color: #ffffff; font-size: 28px; font-weight: bold; background: #1a3a6e; "
+                "border-radius: 4px; padding: 4px;"
+            );
+        } else {
+            messageLabel->setStyleSheet(
+                "color: #cccccc; font-size: 28px; font-weight: bold; background: #16213e; "
+                "border-radius: 4px; padding: 4px;"
+            );
+        }
     });
 }
 
@@ -185,10 +208,14 @@ void SpellMasterUI::showRecognitionResult(bool success, const std::string& messa
 {
     if (success) {
         recognitionLabel->setText(QString::fromStdString(message));
-        recognitionLabel->setStyleSheet("color: #44bb44; font-size: 11px;");
+        recognitionLabel->setStyleSheet(
+            "color: #44bb44; font-size: 28px; font-weight: bold;"
+        );
     } else {
         recognitionLabel->setText(QString::fromStdString(message));
-        recognitionLabel->setStyleSheet("color: #ff4444; font-size: 11px;");
+        recognitionLabel->setStyleSheet(
+            "color: #ff4444; font-size: 28px; font-weight: bold;"
+        );
     }
     recognitionTimer->start(2000);
 }
@@ -207,6 +234,9 @@ void SpellMasterUI::setConnectionLost(bool lost)
 void SpellMasterUI::updateDisplay(const GameStatus &gs)
 {
     status = gs;
+
+    if (!status.self.name.empty())
+        playerDebugLabel->setText(QString::fromStdString(status.self.name));
 
     switch (status.phase) {
     case GamePhase::LOBBY:
@@ -230,24 +260,24 @@ void SpellMasterUI::updateDisplay(const GameStatus &gs)
 
         if (status.phase == GamePhase::GET_READY) {
             phaseLabel->setText("GET READY");
-            phaseLabel->setStyleSheet("color: #ffcc00; font-size: 16px; font-weight: bold;");
+            phaseLabel->setStyleSheet("color: #ffcc00; font-size: 24px; font-weight: bold;");
             timerLabel->setText(QString("Time: %1s").arg(status.castTimeLeft));
-            timerLabel->setStyleSheet("color: #ffcc00; font-size: 16px;");
+            timerLabel->setStyleSheet("color: #ffcc00; font-size: 32px; font-weight: bold;");
         } else if (status.phase == GamePhase::CASTING) {
             phaseLabel->setText("CASTING");
-            phaseLabel->setStyleSheet("color: #44bb44; font-size: 16px; font-weight: bold;");
+            phaseLabel->setStyleSheet("color: #44bb44; font-size: 24px; font-weight: bold;");
             if (status.castTimeLeft <= 3) {
                 timerLabel->setText(QString("Time: %1s").arg(status.castTimeLeft));
-                timerLabel->setStyleSheet("color: #ff4444; font-size: 16px; font-weight: bold;");
+                timerLabel->setStyleSheet("color: #ff4444; font-size: 32px; font-weight: bold;");
             } else {
                 timerLabel->setText(QString("Time: %1s").arg(status.castTimeLeft));
-                timerLabel->setStyleSheet("color: #44bb44; font-size: 16px;");
+                timerLabel->setStyleSheet("color: #44bb44; font-size: 32px; font-weight: bold;");
             }
         } else {
             phaseLabel->setText("RESOLVING");
-            phaseLabel->setStyleSheet("color: #44aaff; font-size: 16px; font-weight: bold;");
+            phaseLabel->setStyleSheet("color: #44aaff; font-size: 24px; font-weight: bold;");
             timerLabel->setText(QString("Time: %1s").arg(status.castTimeLeft));
-            timerLabel->setStyleSheet("color: #44aaff; font-size: 16px;");
+            timerLabel->setStyleSheet("color: #44aaff; font-size: 32px; font-weight: bold;");
         }
 
         selfPanel.update(status.self, "YOU",
@@ -271,13 +301,13 @@ void SpellMasterUI::updateDisplay(const GameStatus &gs)
         }
         if (status.winner == "Nobody") {
             winnerLabel->setText("DRAW!");
-            winnerLabel->setStyleSheet("color: #ffcc00; font-size: 36px; font-weight: bold;");
+            winnerLabel->setStyleSheet("color: #ffcc00; font-size: 56px; font-weight: bold;");
         } else if (status.winner == status.self.name) {
             winnerLabel->setText("YOU WON!");
-            winnerLabel->setStyleSheet("color: #44ff44; font-size: 36px; font-weight: bold;");
+            winnerLabel->setStyleSheet("color: #44ff44; font-size: 56px; font-weight: bold;");
         } else {
             winnerLabel->setText("YOU LOST!");
-            winnerLabel->setStyleSheet("color: #ff4444; font-size: 36px; font-weight: bold;");
+            winnerLabel->setStyleSheet("color: #ff4444; font-size: 56px; font-weight: bold;");
         }
         resultDetails->setText(QString("You: %1 HP  |  Opponent: %2 HP")
             .arg(status.self.hp).arg(status.opponent.hp));
@@ -286,6 +316,20 @@ void SpellMasterUI::updateDisplay(const GameStatus &gs)
     }
 
     prevPhase = status.phase;
+
+    if (status.phase == GamePhase::CASTING &&
+        status.statusMessage.find("Waiting") == std::string::npos) {
+        if (!pulseTimer->isActive())
+            pulseTimer->start(500);
+    } else {
+        if (pulseTimer->isActive()) {
+            pulseTimer->stop();
+            messageLabel->setStyleSheet(
+                "color: #cccccc; font-size: 28px; font-weight: bold; background: #16213e; "
+                "border-radius: 4px; padding: 4px;"
+            );
+        }
+    }
 }
 
 void SpellMasterUI::handleReady()
@@ -307,17 +351,17 @@ QWidget* SpellMasterUI::createLobbyScreen()
     layout->setAlignment(Qt::AlignCenter);
 
     auto *title = new QLabel("SpellMaster");
-    title->setStyleSheet("color: #ffcc00; font-size: 42px; font-weight: bold;");
+    title->setStyleSheet("color: #ffcc00; font-size: 52px; font-weight: bold;");
     title->setAlignment(Qt::AlignCenter);
 
     auto *subtitle = new QLabel("A Wizard Duel");
-    subtitle->setStyleSheet("color: #888888; font-size: 16px;");
+    subtitle->setStyleSheet("color: #888888; font-size: 20px;");
     subtitle->setAlignment(Qt::AlignCenter);
 
     readyBtn = new QPushButton("READY");
-    readyBtn->setFixedSize(200, 60);
+    readyBtn->setFixedSize(280, 70);
     readyBtn->setStyleSheet(
-        "QPushButton { background: #2d6a2d; color: white; font-size: 20px; "
+        "QPushButton { background: #2d6a2d; color: white; font-size: 26px; "
         "font-weight: bold; border-radius: 8px; border: 2px solid #44aa44; }"
         "QPushButton:pressed { background: #44aa44; }"
         "QPushButton:disabled { background: #333333; border: 2px solid #555555; color: #888888; }"
@@ -325,7 +369,7 @@ QWidget* SpellMasterUI::createLobbyScreen()
     QObject::connect(readyBtn, &QPushButton::clicked, [this]() { handleReady(); });
 
     lobbyStatus = new QLabel("Press READY to start");
-    lobbyStatus->setStyleSheet("color: #aaaaaa; font-size: 14px;");
+    lobbyStatus->setStyleSheet("color: #aaaaaa; font-size: 18px;");
     lobbyStatus->setAlignment(Qt::AlignCenter);
 
     auto *btnLayout = new QHBoxLayout;
@@ -348,17 +392,21 @@ QWidget* SpellMasterUI::createBattleScreen()
 {
     auto *screen = new QWidget;
     auto *layout = new QVBoxLayout(screen);
-    layout->setContentsMargins(15, 10, 15, 10);
+    layout->setContentsMargins(15, 8, 15, 8);
+    layout->setSpacing(4);
 
     auto *topBar = new QHBoxLayout;
     roundLabel = new QLabel("Round 1");
-    roundLabel->setStyleSheet("color: white; font-size: 16px; font-weight: bold;");
+    roundLabel->setStyleSheet("color: white; font-size: 24px; font-weight: bold;");
+    roundLabel->setFixedHeight(34);
     timerLabel = new QLabel("Time: 10s");
-    timerLabel->setStyleSheet("color: #ffaa00; font-size: 16px;");
+    timerLabel->setStyleSheet("color: #ffaa00; font-size: 32px; font-weight: bold;");
     timerLabel->setAlignment(Qt::AlignCenter);
+    timerLabel->setFixedHeight(34);
     phaseLabel = new QLabel("CASTING");
-    phaseLabel->setStyleSheet("color: #ffaa00; font-size: 16px; font-weight: bold;");
+    phaseLabel->setStyleSheet("color: #ffaa00; font-size: 24px; font-weight: bold;");
     phaseLabel->setAlignment(Qt::AlignRight);
+    phaseLabel->setFixedHeight(34);
     topBar->addWidget(roundLabel);
     topBar->addWidget(timerLabel);
     topBar->addWidget(phaseLabel);
@@ -368,22 +416,22 @@ QWidget* SpellMasterUI::createBattleScreen()
     panels->setSpacing(15);
     panels->addWidget(selfPanel.create("YOU"));
     panels->addWidget(opponentPanel.create("OPPONENT"));
-    layout->addLayout(panels, 1);
+    layout->addLayout(panels);
+
+    recognitionLabel = new QLabel("");
+    recognitionLabel->setStyleSheet("font-size: 28px;");
+    recognitionLabel->setAlignment(Qt::AlignCenter);
+    recognitionLabel->setFixedHeight(40);
+    layout->addWidget(recognitionLabel);
 
     messageLabel = new QLabel("Cast your spell!");
     messageLabel->setStyleSheet(
-        "color: #cccccc; font-size: 14px; background: #16213e; "
-        "border-radius: 4px; padding: 8px;"
+        "color: #cccccc; font-size: 28px; font-weight: bold; background: #16213e; "
+        "border-radius: 4px; padding: 4px;"
     );
     messageLabel->setAlignment(Qt::AlignCenter);
-    messageLabel->setFixedHeight(40);
+    messageLabel->setFixedHeight(48);
     layout->addWidget(messageLabel);
-
-    recognitionLabel = new QLabel("");
-    recognitionLabel->setStyleSheet("font-size: 11px;");
-    recognitionLabel->setAlignment(Qt::AlignRight);
-    recognitionLabel->setFixedHeight(20);
-    layout->addWidget(recognitionLabel);
 
     return screen;
 }
@@ -395,17 +443,17 @@ QWidget* SpellMasterUI::createResultScreen()
     layout->setAlignment(Qt::AlignCenter);
 
     winnerLabel = new QLabel("");
-    winnerLabel->setStyleSheet("color: #ffcc00; font-size: 36px; font-weight: bold;");
+    winnerLabel->setStyleSheet("color: #ffcc00; font-size: 56px; font-weight: bold;");
     winnerLabel->setAlignment(Qt::AlignCenter);
 
     resultDetails = new QLabel("");
-    resultDetails->setStyleSheet("color: #aaaaaa; font-size: 16px;");
+    resultDetails->setStyleSheet("color: #aaaaaa; font-size: 24px;");
     resultDetails->setAlignment(Qt::AlignCenter);
 
     resultReadyBtn = new QPushButton("PLAY AGAIN");
-    resultReadyBtn->setFixedSize(200, 60);
+    resultReadyBtn->setFixedSize(280, 70);
     resultReadyBtn->setStyleSheet(
-        "QPushButton { background: #2d6a2d; color: white; font-size: 20px; "
+        "QPushButton { background: #2d6a2d; color: white; font-size: 26px; "
         "font-weight: bold; border-radius: 8px; border: 2px solid #44aa44; }"
         "QPushButton:pressed { background: #44aa44; }"
         "QPushButton:disabled { background: #333333; border: 2px solid #555555; color: #888888; }"
