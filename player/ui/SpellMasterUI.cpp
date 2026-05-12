@@ -156,6 +156,18 @@ SpellMasterUI::SpellMasterUI(const QString &windowTitle)
     versionLabel->setAlignment(Qt::AlignRight);
     versionLabel->raise();
 
+    connectionOverlay = new QWidget(this);
+    connectionOverlay->setGeometry(0, 0, 800, 480);
+    connectionOverlay->setStyleSheet("background: rgba(0, 0, 0, 180);");
+    connectionLabel = new QLabel("Connection lost", connectionOverlay);
+    connectionLabel->setStyleSheet(
+        "color: #ff4444; font-size: 28px; font-weight: bold;"
+    );
+    connectionLabel->setAlignment(Qt::AlignCenter);
+    connectionLabel->setGeometry(0, 200, 800, 80);
+    connectionOverlay->hide();
+    connectionOverlay->raise();
+
     recognitionTimer = new QTimer(this);
     recognitionTimer->setSingleShot(true);
     QObject::connect(recognitionTimer, &QTimer::timeout, [this]() {
@@ -181,12 +193,25 @@ void SpellMasterUI::showRecognitionResult(bool success, const std::string& messa
     recognitionTimer->start(2000);
 }
 
+void SpellMasterUI::setConnectionLost(bool lost)
+{
+    if (lost) {
+        readySent = false;
+        connectionOverlay->raise();
+        connectionOverlay->show();
+    } else {
+        connectionOverlay->hide();
+    }
+}
+
 void SpellMasterUI::updateDisplay(const GameStatus &gs)
 {
     status = gs;
 
     switch (status.phase) {
     case GamePhase::LOBBY:
+        if (prevPhase != GamePhase::LOBBY)
+            readySent = false;
         if (!readySent) {
             readyBtn->setEnabled(true);
             readyBtn->setText("READY");
@@ -259,6 +284,8 @@ void SpellMasterUI::updateDisplay(const GameStatus &gs)
         screens->setCurrentIndex(RESULT);
         break;
     }
+
+    prevPhase = status.phase;
 }
 
 void SpellMasterUI::handleReady()

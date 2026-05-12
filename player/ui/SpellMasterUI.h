@@ -16,7 +16,7 @@
 #include <functional>
 #include <string>
 
-static const char* UI_VERSION = "v0.2.0";
+static const char* UI_VERSION = "v0.3.0";
 
 /// HP or Mana bar with label and numeric text
 struct StatBar {
@@ -76,7 +76,10 @@ class SpellMasterUI : public QWidget {
     QPushButton *resultReadyBtn;
     QLabel *recognitionLabel;
     QTimer *recognitionTimer;
+    QWidget *connectionOverlay;
+    QLabel *connectionLabel;
     bool readySent = false;
+    GamePhase prevPhase = GamePhase::LOBBY;
     enum Screen { LOBBY = 0, BATTLE = 1, RESULT = 2 };
 
 public:
@@ -97,6 +100,11 @@ public:
     /// Update all UI elements from GameStatus received via ZeroMQ
     /// @param gs Current game status for this player
     void updateDisplay(const GameStatus &gs);
+
+    /// Show or hide the connection lost overlay
+    /// Resets readySent when connection is lost so READY works on reconnect
+    /// @param lost true to show overlay, false to hide
+    void setConnectionLost(bool lost);
 
 private:
     void handleReady();
