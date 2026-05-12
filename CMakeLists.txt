@@ -37,6 +37,16 @@ endif()
 # Delte headers (gamestatus.h, spellmessage.h, serialization.h, transport.h)
 include_directories(${CMAKE_SOURCE_DIR}/common)
 
+# GoogleTest
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+)
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+enable_testing()
+
 # Player-komponenter (UI + ImageProcessing)
 if(EXISTS ${CMAKE_SOURCE_DIR}/player)
     add_subdirectory(player/ui)
@@ -46,4 +56,9 @@ endif()
 # Gamemaster-komponenter (GameLogic)
 if(EXISTS ${CMAKE_SOURCE_DIR}/gamemaster)
     add_subdirectory(gamemaster/gamelogic)
+endif()
+
+# Tests
+if(EXISTS ${CMAKE_SOURCE_DIR}/test)
+    add_subdirectory(test)
 endif()

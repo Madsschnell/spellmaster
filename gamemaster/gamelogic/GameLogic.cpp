@@ -3,15 +3,15 @@
 #include <iostream>
 
 GameLogic::GameLogic()
-    : player1("Player 1", 100, 50)
-    , player2("Player 2", 100, 50)
+    : player1("Player 1", 100, 50), player2("Player 2", 100, 50)
 {
 }
 
-bool GameLogic::loadSpells(const std::string& path)
+bool GameLogic::loadSpells(const std::string &path)
 {
     std::ifstream file(path);
-    if (!file.is_open()) {
+    if (!file.is_open())
+    {
         std::cerr << "Could not open " << path << std::endl;
         return false;
     }
@@ -19,7 +19,8 @@ bool GameLogic::loadSpells(const std::string& path)
     nlohmann::json j;
     file >> j;
 
-    for (auto& [name, data] : j.items()) {
+    for (auto &[name, data] : j.items())
+    {
         Spell s;
         s.name = name;
         s.manaCost = data["manaCost"];
@@ -35,38 +36,46 @@ bool GameLogic::loadSpells(const std::string& path)
     return true;
 }
 
-void GameLogic::onPlayerAction(const PlayerAction& action)
+void GameLogic::onPlayerAction(const PlayerAction &action)
 {
-    if (action.action == "ready") {
-        if (action.playerId == "player1") p1Ready = true;
-        if (action.playerId == "player2") p2Ready = true;
+    if (action.action == "ready")
+    {
+        if (action.playerId == "player1")
+            p1Ready = true;
+        if (action.playerId == "player2")
+            p2Ready = true;
         std::cout << action.playerId << " is ready" << std::endl;
 
         if (p1Ready && p2Ready &&
-            (phase == GamePhase::LOBBY || phase == GamePhase::GAME_OVER)) {
+            (phase == GamePhase::LOBBY || phase == GamePhase::GAME_OVER))
+        {
             startGame();
         }
     }
 }
 
-void GameLogic::onSpellMessage(const SpellMessage& msg)
+void GameLogic::onSpellMessage(const SpellMessage &msg)
 {
-    if (phase != GamePhase::CASTING) return;
+    if (phase != GamePhase::CASTING)
+        return;
 
     auto it = spells.find(msg.spellName);
-    if (it == spells.end()) {
+    if (it == spells.end())
+    {
         std::cout << "Unknown spell: " << msg.spellName << std::endl;
         return;
     }
 
-    const Spell& spell = it->second;
+    const Spell &spell = it->second;
     bool isP1 = (msg.playerId == "player1");
-    Player& caster = isP1 ? player1 : player2;
-    std::string& castName = isP1 ? p1SpellName : p2SpellName;
+    Player &caster = isP1 ? player1 : player2;
+    std::string &castName = isP1 ? p1SpellName : p2SpellName;
 
-    if (!castName.empty()) return;
+    if (!castName.empty())
+        return;
 
-    if (caster.getMana() < spell.manaCost) {
+    if (caster.getMana() < spell.manaCost)
+    {
         std::string &rejected = isP1 ? p1SpellRejected : p2SpellRejected;
         rejected = "Not enough mana for " + spell.name;
         std::cout << caster.getName() << " does not have enough mana for "
@@ -81,9 +90,12 @@ void GameLogic::onSpellMessage(const SpellMessage& msg)
     std::string &rejected = isP1 ? p1SpellRejected : p2SpellRejected;
     rejected = "";
 
-    if (spell.isDefensive) {
-        if (isP1) p1Shielded = true;
-        else p2Shielded = true;
+    if (spell.isDefensive)
+    {
+        if (isP1)
+            p1Shielded = true;
+        else
+            p2Shielded = true;
     }
 
     std::cout << caster.getName() << " casts " << spell.name << std::endl;
@@ -91,13 +103,15 @@ void GameLogic::onSpellMessage(const SpellMessage& msg)
 
 void GameLogic::tick()
 {
-    switch (phase) {
+    switch (phase)
+    {
     case GamePhase::LOBBY:
         break;
 
     case GamePhase::GET_READY:
         castTimeLeft--;
-        if (castTimeLeft <= 0) {
+        if (castTimeLeft <= 0)
+        {
             phase = GamePhase::CASTING;
             castTimeLeft = 10;
             std::cout << "CASTING started (Round " << round << ")" << std::endl;
@@ -106,18 +120,23 @@ void GameLogic::tick()
 
     case GamePhase::CASTING:
         castTimeLeft--;
-        if (castTimeLeft <= 0) {
+        if (castTimeLeft <= 0)
+        {
             resolve();
         }
         break;
 
     case GamePhase::RESOLVING:
         castTimeLeft--;
-        if (castTimeLeft <= 0) {
-            if (!winner.empty()) {
+        if (castTimeLeft <= 0)
+        {
+            if (!winner.empty())
+            {
                 phase = GamePhase::GAME_OVER;
                 std::cout << "GAME OVER: " << winner << " wins!" << std::endl;
-            } else {
+            }
+            else
+            {
                 nextRound();
             }
         }
@@ -128,7 +147,7 @@ void GameLogic::tick()
     }
 }
 
-GameStatus GameLogic::getStatusForPlayer(const std::string& playerId)
+GameStatus GameLogic::getStatusForPlayer(const std::string &playerId)
 {
     GameStatus gs;
     gs.phase = phase;
@@ -136,7 +155,8 @@ GameStatus GameLogic::getStatusForPlayer(const std::string& playerId)
     gs.castTimeLeft = castTimeLeft;
     gs.winner = winner;
 
-    auto makeInfo = [this](const Player& p, const std::string& spellName) {
+    auto makeInfo = [this](const Player &p, const std::string &spellName)
+    {
         PlayerInfo info;
         info.name = p.getName();
         info.hp = p.getHp();
@@ -144,7 +164,8 @@ GameStatus GameLogic::getStatusForPlayer(const std::string& playerId)
         info.mana = p.getMana();
         info.maxMana = 50;
         info.spellCast = spellName;
-        if (!spellName.empty() && spellName != "Miss") {
+        if (!spellName.empty() && spellName != "Miss")
+        {
             auto it = spells.find(spellName);
             if (it != spells.end())
                 info.spellDescription = it->second.description;
@@ -152,13 +173,16 @@ GameStatus GameLogic::getStatusForPlayer(const std::string& playerId)
         return info;
     };
 
-    if (playerId == "player1") {
+    if (playerId == "player1")
+    {
         gs.self = makeInfo(player1, p1SpellName);
         gs.opponent = makeInfo(player2, p2SpellName);
         gs.selfEffect = p1Effect;
         gs.opponentEffect = p2Effect;
         gs.spellRejected = p1SpellRejected;
-    } else {
+    }
+    else
+    {
         gs.self = makeInfo(player2, p2SpellName);
         gs.opponent = makeInfo(player1, p1SpellName);
         gs.selfEffect = p2Effect;
@@ -198,32 +222,42 @@ void GameLogic::startGame()
 
 void GameLogic::resolve()
 {
-    if (p1SpellName.empty()) p1SpellName = "Miss";
-    if (p2SpellName.empty()) p2SpellName = "Miss";
+    if (p1SpellName.empty())
+        p1SpellName = "Miss";
+    if (p2SpellName.empty())
+        p2SpellName = "Miss";
 
     int p1HpBefore = player1.getHp();
     int p2HpBefore = player2.getHp();
 
     // Apply player 1's spell
     auto it1 = spells.find(p1SpellName);
-    if (it1 != spells.end()) {
-        const Spell& spell = it1->second;
-        if (spell.healAmount > 0) player1.heal(spell.healAmount);
-        if (spell.damage > 0) {
+    if (it1 != spells.end())
+    {
+        const Spell &spell = it1->second;
+        if (spell.healAmount > 0)
+            player1.heal(spell.healAmount);
+        if (spell.damage > 0)
+        {
             int dmg = spell.damage;
-            if (p2Shielded) dmg /= 2;
+            if (p2Shielded)
+                dmg /= 2;
             player2.takeDamage(dmg);
         }
     }
 
     // Apply player 2's spell
     auto it2 = spells.find(p2SpellName);
-    if (it2 != spells.end()) {
-        const Spell& spell = it2->second;
-        if (spell.healAmount > 0) player2.heal(spell.healAmount);
-        if (spell.damage > 0) {
+    if (it2 != spells.end())
+    {
+        const Spell &spell = it2->second;
+        if (spell.healAmount > 0)
+            player2.heal(spell.healAmount);
+        if (spell.damage > 0)
+        {
             int dmg = spell.damage;
-            if (p1Shielded) dmg /= 2;
+            if (p1Shielded)
+                dmg /= 2;
             player1.takeDamage(dmg);
         }
     }
@@ -236,10 +270,14 @@ void GameLogic::resolve()
 
     std::cout << "RESOLVING: " << p1SpellName << " vs " << p2SpellName << std::endl;
 
-    if (!player1.isAlive() || !player2.isAlive()) {
-        if (player1.getHp() > player2.getHp()) winner = player1.getName();
-        else if (player2.getHp() > player1.getHp()) winner = player2.getName();
-        else winner = "Nobody";
+    if (!player1.isAlive() || !player2.isAlive())
+    {
+        if (player1.getHp() > player2.getHp())
+            winner = player1.getName();
+        else if (player2.getHp() > player1.getHp())
+            winner = player2.getName();
+        else
+            winner = "Nobody";
     }
 
     phase = GamePhase::RESOLVING;
@@ -279,16 +317,19 @@ EffectInfo GameLogic::computeEffect(int delta, bool shielded)
     return {};
 }
 
-std::string GameLogic::getStatusMessage(const std::string& playerId)
+std::string GameLogic::getStatusMessage(const std::string &playerId)
 {
-    switch (phase) {
+    switch (phase)
+    {
     case GamePhase::LOBBY:
         return "Press READY to start";
     case GamePhase::GET_READY:
         return "Get ready!";
-    case GamePhase::CASTING: {
-        const std::string& castName = (playerId == "player1") ? p1SpellName : p2SpellName;
-        if (!castName.empty()) return "Waiting for opponent...";
+    case GamePhase::CASTING:
+    {
+        const std::string &castName = (playerId == "player1") ? p1SpellName : p2SpellName;
+        if (!castName.empty())
+            return "Waiting for opponent...";
         return "Cast your spell!";
     }
     case GamePhase::RESOLVING:
