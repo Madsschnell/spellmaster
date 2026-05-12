@@ -28,7 +28,7 @@ QWidget* StatBar::create(const QString &name, const QString &barColor)
     );
 
     text = new QLabel("100/100");
-    text->setFixedWidth(70);
+    text->setFixedWidth(79);
     text->setStyleSheet("color: #cccccc; font-size: 18px; font-weight: bold; background: transparent; border: none;");
     text->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 
@@ -78,7 +78,7 @@ QWidget* PlayerPanel::create(const QString &title)
 
     spellLabel = new QLabel("Spell: ---");
     spellLabel->setStyleSheet(
-        "color: #aaaaaa; font-size: 24px; font-weight: bold; "
+        "color: #aaaaaa; font-size: 21px; font-weight: bold; "
         "background: #111122; border-radius: 4px; border: none;"
     );
     spellLabel->setAlignment(Qt::AlignCenter);
