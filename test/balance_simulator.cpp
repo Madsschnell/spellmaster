@@ -5,7 +5,7 @@
 #include <iomanip>
 #include <algorithm>
 
-// Hjælpefunktion til at printe en strategi pænt (fx "Drain+Fireball")
+// Helper function to format a strategy as a string (e.g. "Drain+Fireball")
 std::string stratToString(const std::vector<std::string> &strat)
 {
     if (strat.empty())
@@ -18,14 +18,14 @@ std::string stratToString(const std::vector<std::string> &strat)
     return s;
 }
 
-// Returnerer 1 hvis p1 vinder, 2 hvis p2 vinder, 0 for uafgjort
+// Returns 1 if P1 wins, 2 if P2 wins, 0 for draw
 int simulateMatchup(const std::vector<std::string> &p1Strat, const std::vector<std::string> &p2Strat, GameLogic &game)
 {
-    // Tving spillet i gang (virker baade fra LOBBY og GAME_OVER state)
+    // Force game start (works from both LOBBY and GAME_OVER state)
     game.onPlayerAction({"player1", "ready"});
     game.onPlayerAction({"player2", "ready"});
 
-    int max_ticks = 200; // 200 ticks svarer til praecis 10 runder (20 ticks pr. runde)
+    int max_ticks = 200; // 200 ticks equals exactly 10 rounds (20 ticks per round)
     int ticks = 0;
     int p1Index = 0;
     int p2Index = 0;
@@ -33,7 +33,7 @@ int simulateMatchup(const std::vector<std::string> &p1Strat, const std::vector<s
 
     while (game.getPhase() != GamePhase::GAME_OVER && ticks < max_ticks)
     {
-        // Sørg for at vi kun kaster én gang pr CASTING fase
+        // Ensure we only cast once per CASTING phase
         if (game.getPhase() == GamePhase::CASTING && !castThisRound)
         {
             std::string s1 = p1Strat[p1Index % p1Strat.size()];
@@ -47,13 +47,13 @@ int simulateMatchup(const std::vector<std::string> &p1Strat, const std::vector<s
             castThisRound = true;
         }
 
-        // Gør klar til næste runde når vi er i resolving
+        // Reset cast flag when entering resolving (ready for next round)
         if (game.getPhase() == GamePhase::RESOLVING)
         {
             castThisRound = false;
         }
 
-        // Kør spillet en "sekund" frem i tiden
+        // Advance game by one "second"
         game.tick();
         ticks++;
     }
@@ -61,7 +61,7 @@ int simulateMatchup(const std::vector<std::string> &p1Strat, const std::vector<s
     GameStatus status = game.getStatusForPlayer("player1");
     if (ticks >= max_ticks)
     {
-        return 0; // Uafgjort pga timeout (eller heale uendeligt)
+        return 0; // Draw due to timeout (e.g. infinite heal loops)
     }
     else if (status.winner == "Player 1")
     {
@@ -74,6 +74,7 @@ int simulateMatchup(const std::vector<std::string> &p1Strat, const std::vector<s
     return 0;
 }
 
+// Recursively generate all spell sequences from length 1 to maxLength
 void generateStrategies(const std::vector<std::string> &spells, std::vector<std::string> current, int maxLength, std::vector<std::vector<std::string>> &allStrats)
 {
     if (!current.empty())
@@ -111,7 +112,7 @@ int main()
         return 1;
     }
 
-    // Opdateret liste der præcist matcher din spells.json
+    // Available spells matching spells.json
     std::vector<std::string> availableSpells = {
         "Fireball", "Lightning", "Shield", "Heal", "Drain"};
 
@@ -131,6 +132,7 @@ int main()
     std::cout << "\nGenereret " << strategies.size() << " unikke strategier (laengde 1 til " << maxSequenceLength << ").\n";
     std::cout << "Beregner turnering (" << totalMatches << " kampe alle-mod-alle)... Vent venligst.\n\n";
 
+    // Suppress GameLogic console output during simulation for performance
     std::streambuf *oldCoutStreamBuf = std::cout.rdbuf();
     std::cout.rdbuf(nullptr);
 
@@ -157,8 +159,10 @@ int main()
         }
     }
 
+    // Restore console output
     std::cout.rdbuf(oldCoutStreamBuf);
 
+    // Sort by wins (descending), then by losses (ascending)
     std::sort(results.begin(), results.end(), [](const StratResult &a, const StratResult &b)
               {
                   if (a.wins != b.wins) return a.wins > b.wins;

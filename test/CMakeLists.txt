@@ -4,13 +4,13 @@ add_executable(game_tests
     ../gamemaster/gamelogic/Player.cpp
 )
 
-# Fortæl testen hvor den kan finde header-filerne (.h)
+# Include paths for header files
 target_include_directories(game_tests PRIVATE 
     ${CMAKE_SOURCE_DIR}/gamemaster/gamelogic
     ${CMAKE_SOURCE_DIR}/common
 )
 
-# Link GTest og nlohmann_json
+# Link GTest and nlohmann_json
 target_link_libraries(game_tests PRIVATE
     gtest_main
     nlohmann_json::nlohmann_json
@@ -19,7 +19,7 @@ target_link_libraries(game_tests PRIVATE
 include(GoogleTest)
 gtest_discover_tests(game_tests)
 
-# --- Tilføj Balance Simulatoren ---
+# --- Balance Simulator ---
 add_executable(balance_simulator
     balance_simulator.cpp
     ../gamemaster/gamelogic/GameLogic.cpp

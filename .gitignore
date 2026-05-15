@@ -2,6 +2,9 @@
 build/
 cmake-build-*/
 
+# CTest output
+Testing/
+
 # Doxygen output
 docs/
 
