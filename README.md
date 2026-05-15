@@ -42,6 +42,10 @@ spellmaster/
 │   ├── camview.cpp
 │   ├── colortest.cpp
 │   └── zmq_latency_test.cpp
+├── test/                                Modultests og balancesimulator
+│   ├── CMakeLists.txt
+│   ├── Gtest.cpp                        GTest modultest af GameLogic (4 testcases)
+│   └── balance_simulator.cpp            Balancesimulator (alle-mod-alle strategi-turnering)
 ├── CMakeLists.txt                       Top-level CMake
 ├── Doxyfile                             Doxygen-konfiguration
 ├── .gitignore
@@ -58,6 +62,7 @@ spellmaster/
 | ZeroMQ (libzmq) | Netværkskommunikation | Ja |
 | nlohmann_json | JSON serialisering | Ja (FetchContent fallback) |
 | cppzmq | ZeroMQ C++ bindings | Ja (FetchContent fallback) |
+| Google Test | Modultest af GameLogic | Ja (FetchContent) |
 | OpenCV | IR-detektion og gesture-genkendelse | Ja |
 | Cage | Wayland kiosk compositor | Kun Player RPi |
 | Doxygen + Graphviz | Kodedokumentation | Valgfrit |
@@ -112,6 +117,8 @@ Bygger tre executables:
 | `gamemaster` | `build/gamemaster/gamelogic/` | GameMaster: spillogik og netværk |
 | `spellmaster_player` | `build/player/` | Player: UI + ImageProcessing + netværk |
 | `spellmaster_ui` | `build/player/ui/` | Standalone UI rendertest (ingen netværk) |
+| `game_tests` | `build/test/` | GTest modultest af GameLogic |
+| `balance_simulator` | `build/test/` | Balancesimulator (strategi-turnering) |
 
 ## Kør
 
