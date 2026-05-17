@@ -1,7 +1,7 @@
-// camview.cpp - Kamera-preview på DSI-skærm via Cage + Qt6
-// Starter rpicam-vid som subprocess og viser MJPEG-frames i et QWidget.
-// Kompiler: g++ camview.cpp -o camview $(pkg-config --cflags --libs Qt6Widgets) -fPIC
-// Kør:      sudo XDG_RUNTIME_DIR=/run/user/1000 cage -- /home/spellmaster/camview
+// camview.cpp - Camera preview on DSI screen via Cage + Qt6
+// Starts rpicam-vid as subprocess and displays MJPEG frames in a QWidget.
+// Build: g++ camview.cpp -o camview $(pkg-config --cflags --libs Qt6Widgets) -fPIC
+// Run:   sudo XDG_RUNTIME_DIR=/run/user/1000 cage -- /home/spellmaster/camview
 
 #include <QApplication>
 #include <QWidget>

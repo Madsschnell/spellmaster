@@ -1,0 +1,56 @@
+# Doxyfile for SpellMaster
+# Generate docs: run 'doxygen' in the project root
+# Output: docs/html/index.html
+
+# Project
+PROJECT_NAME           = "SpellMaster"
+PROJECT_BRIEF          = "A Wizard Duel - Embedded Systems Project (PRJ3)"
+PROJECT_NUMBER         = "v1.0"
+OUTPUT_DIRECTORY       = docs
+
+# Input
+INPUT                  = common \
+                         gamemaster/gamelogic \
+                         player/ui \
+                         player/imageprocessing \
+                         player/main.cpp \
+                         gamemaster/gamelogic/main.cpp
+FILE_PATTERNS          = *.h *.cpp
+RECURSIVE              = NO
+
+# Parsing
+EXTRACT_ALL            = NO
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+HIDE_UNDOC_MEMBERS     = YES
+HIDE_UNDOC_CLASSES     = NO
+BRIEF_MEMBER_DESC      = YES
+JAVADOC_AUTOBRIEF      = YES
+QT_AUTOBRIEF           = YES
+
+# Output format
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+HTML_OUTPUT            = html
+HTML_COLORSTYLE        = DARK
+
+# Source browsing
+SOURCE_BROWSER         = YES
+INLINE_SOURCES         = NO
+STRIP_CODE_COMMENTS    = NO
+
+# Graphs (requires graphviz)
+HAVE_DOT               = YES
+CALL_GRAPH             = YES
+CALLER_GRAPH           = NO
+DOT_IMAGE_FORMAT       = svg
+INTERACTIVE_SVG        = YES
+CLASS_GRAPH            = YES
+COLLABORATION_GRAPH    = YES
+INCLUDE_GRAPH          = YES
+INCLUDED_BY_GRAPH      = YES
+DIRECTORY_GRAPH        = YES
+
+# Warnings
+WARN_IF_UNDOCUMENTED   = YES
+WARN_NO_PARAMDOC       = YES

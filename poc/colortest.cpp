@@ -1,6 +1,6 @@
-// colortest.cpp - Farve- og touchtest for Cage + Qt6
-// Kompiler: g++ colortest.cpp -o colortest $(pkg-config --cflags --libs Qt6Widgets) -fPIC
-// Kør:      sudo XDG_RUNTIME_DIR=/run/user/1000 cage -- /home/spellmaster/colortest
+// colortest.cpp - Color and touch test for Cage + Qt6
+// Build: g++ colortest.cpp -o colortest $(pkg-config --cflags --libs Qt6Widgets) -fPIC
+// Run:   sudo XDG_RUNTIME_DIR=/run/user/1000 cage -- /home/spellmaster/colortest
 
 #include <QApplication>
 #include <QWidget>
