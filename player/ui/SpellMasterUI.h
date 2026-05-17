@@ -16,7 +16,7 @@
 #include <functional>
 #include <string>
 
-static const char* UI_VERSION = "v0.4.0";
+static const char* UI_VERSION = "v1.0";
 
 /// HP or Mana bar with label and numeric text
 struct StatBar {

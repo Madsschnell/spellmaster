@@ -45,7 +45,8 @@ spellmaster/
 ├── test/                                Modultests og balancesimulator
 │   ├── CMakeLists.txt
 │   ├── Gtest.cpp                        GTest modultest af GameLogic (4 testcases)
-│   └── balance_simulator.cpp            Balancesimulator (alle-mod-alle strategi-turnering)
+│   ├── balance_simulator.cpp            Balancesimulator (alle-mod-alle strategi-turnering)
+│   └── zmqtransport.cpp                 Modultest af ZeroMQ transport og serialisering
 ├── CMakeLists.txt                       Top-level CMake
 ├── Doxyfile                             Doxygen-konfiguration
 ├── .gitignore
@@ -184,6 +185,37 @@ mpv http://<player-ip>:8080
 vlc http://<player-ip>:8080
 
 # Eller åbn URL'en direkte i en browser
+```
+
+## Modultest og simulator
+
+### GTest modultest
+
+```bash
+cd build && ctest --output-on-failure
+```
+
+Eller kør direkte:
+
+```bash
+./build/test/game_tests
+```
+
+### Balancesimulator
+
+```bash
+./build/test/balance_simulator
+```
+
+Genererer en alle-mod-alle turnering med alle spell-kombinationer (længde 1-3) og viser de bedste og dårligste strategier.
+
+### ZmqTransport modultest
+
+Kræver manuel kompilering og to terminaler (eller to RPi-noder):
+
+```bash
+g++ -std=c++17 test/zmqtransport.cpp -o zmqtransport -I common -lzmq
+./zmqtransport
 ```
 
 ## Doxygen
