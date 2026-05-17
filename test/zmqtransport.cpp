@@ -5,7 +5,6 @@
 #include <cassert>
 #include <zmq.hpp>
 
-// vores structs
 #include "GameStatus.h"
 #include "Serialization.h"
 #include "SpellMessage.h"
@@ -16,29 +15,30 @@ using namespace std::chrono_literals;
 
 int main()
 {
-    std::cout << "Starter modultest for ZMQ og Serialisering...\n\n";
+    std::cout << "Starting module test for ZMQ and Serialization...\n\n";
 
     zmq::context_t context(1);
 
-    // Gamemaster (sender af GameStatus, Modtager af actions/spells)
+    // GameMaster side (publishes GameStatus, receives actions/spells)
     zmq::socket_t gm_pub(context, zmq::socket_type::pub);
-    gm_pub.bind("tcp://*:5555"); // erstat * med en specific IP addresse
+    gm_pub.bind("tcp://*:5555");
 
     zmq::socket_t gm_pull(context, zmq::socket_type::pull);
-    gm_pull.bind("tcp://*:5556"); // erstat * med en specific IP addresse
+    gm_pull.bind("tcp://*:5556");
 
-    // Player (mdotager af GameStatus, Afsender af actions/spells)
+    // Player side (receives GameStatus, sends actions/spells)
+    // NOTE: Replace localhost with actual IP when testing across two RPi nodes
     zmq::socket_t player_sub(context, zmq::socket_type::sub);
-    player_sub.connect("tcp://*:5555");                 // erstat * med en specific IP addresse
-    player_sub.set(zmq::sockopt::subscribe, "player1"); // sub på topic "player1"
+    player_sub.connect("tcp://localhost:5555");
+    player_sub.set(zmq::sockopt::subscribe, "player1");
 
     zmq::socket_t player_push(context, zmq::socket_type::push);
-    player_push.connect("tcp://*:5556"); // erstat * med en specific IP addresse
+    player_push.connect("tcp://localhost:5556");
 
     std::this_thread::sleep_for(100ms);
 
-    // NORMAL DRIFT
-    std::cout << "--- Normal drift ---\n";
+    // --- Normal operation ---
+    std::cout << "--- Normal operation ---\n";
 
     // PUB/SUB (GameStatus)
     GameStatus gsOut;
@@ -46,7 +46,7 @@ int main()
     gsOut.selfEffect.type = EffectType::HEAL;
     zmq_publish(gm_pub, "player1", gsOut);
 
-    std::this_thread::sleep_for(10ms); // Vent
+    std::this_thread::sleep_for(10ms);
 
     std::string topic;
     GameStatus gsIn;
@@ -56,7 +56,7 @@ int main()
     assert(topic == "player1");
     assert(gsIn.phase == GamePhase::CASTING);
     assert(gsIn.selfEffect.type == EffectType::HEAL);
-    std::cout << "[OK] Serialisering: GameStatus er fejlfrit.\n";
+    std::cout << "[OK] Serialization: GameStatus round-trip successful.\n";
 
     // PUSH/PULL (SpellMessage)
     SpellMessage smOut{"player1", "Fireball"};
@@ -69,69 +69,69 @@ int main()
     assert(hasSpellMsg);
 
     SpellMessage smIn;
-    gmReceivedJson.get_to(smIn); // Parse JSON via Serialization.h overloads
+    gmReceivedJson.get_to(smIn);
     assert(smIn.spellName == "Fireball");
-    std::cout << "[OK] Deserialisering: SpellMessage er fejlfrit.\n";
+    std::cout << "[OK] Deserialization: SpellMessage round-trip successful.\n";
 
-    // STRESSTEST
-    std::cout << "\n--- Stresstest ---\n";
+    // --- Stress test ---
+    std::cout << "\n--- Stress test ---\n";
 
     const int NUM_MESSAGES = 50;
 
-    // Sender 50 concurrently
+    // Send 50 messages concurrently
     for (int i = 0; i < NUM_MESSAGES; ++i)
     {
         PlayerAction pa{"player1", "ready_" + std::to_string(i)};
         zmq_push(player_push, pa);
     }
 
-    std::this_thread::sleep_for(50ms); // Vent 50 ms for at sikre at alle er fremme i PULL-bufferen
+    std::this_thread::sleep_for(50ms);
 
     int receivedCount = 0;
     PlayerAction paIn;
 
-    // Læser fra PULL-socket indtil bufferen er tom
+    // Read from PULL socket until buffer is empty
     while (zmq_pull_raw(gm_pull, gmReceivedJson))
     {
         gmReceivedJson.get_to(paIn);
-        // Tjekker at de ankommer i præcis samme rækkefølge
+        // Verify messages arrive in the same order they were sent
         assert(paIn.action == "ready_" + std::to_string(receivedCount));
         receivedCount++;
     }
 
     assert(receivedCount == NUM_MESSAGES);
-    std::cout << "[OK] Stresstest: 50 playeraction beskeder sendt og modtaget :).\n";
+    std::cout << "[OK] Stress test: 50 PlayerAction messages sent and received in order.\n";
 
-    // FEJLTEST (Robusthed mod korrupt data)
-    std::cout << "\n--- Fejltest ---\n";
+    // --- Error handling (robustness against corrupt data) ---
+    std::cout << "\n--- Error handling ---\n";
 
-    // Korrupt JSON 1: Forkert datatype. 'mana' forventer en int, men vi sender en string ("halvtreds").
+    // Corrupt JSON 1: Wrong data type. 'mana' expects int, but we send a string.
     std::string badJsonType = "{\"name\":\"Player\",\"hp\":100,\"maxHp\":100,\"mana\":\"halvtreds\",\"maxMana\":50,\"spellCast\":\"\",\"spellDescription\":\"\"}";
     player_push.send(zmq::buffer(badJsonType), zmq::send_flags::none);
 
-    // Korrupt JSON 2: Malformateret syntaks. Mangler afslutningsklamme.
+    // Corrupt JSON 2: Malformed syntax. Missing closing brace.
     std::string badJsonSyntax = "{\"phase\": \"CASTING\"";
     player_push.send(zmq::buffer(badJsonSyntax), zmq::send_flags::none);
 
     std::this_thread::sleep_for(10ms);
 
-    // Aflæser første korrupte besked
+    // Read first corrupt message
     PlayerInfo piBad;
     bool successType = zmq_pull_raw(gm_pull, piBad);
     if (!successType)
     {
-        std::cout << "[OK] Fejlhåndtering: Fanget type-fejl ('mana'). Afvist uden crash.\n";
+        std::cout << "[OK] Error handling: Caught type error ('mana'). Rejected without crash.\n";
     }
 
-    // Aflæser anden korrupte besked (Syntaksfejl) direkte til en GameStatus struct
+    // Read second corrupt message (syntax error)
     GameStatus gsBad;
     bool successSyntax = zmq_pull_raw(gm_pull, gsBad);
     if (!successSyntax)
     {
-        std::cout << "[OK] Fejlhåndtering: Fanget syntaks-fejl. Afvist uden crash.\n";
+        std::cout << "[OK] Error handling: Caught syntax error. Rejected without crash.\n";
     }
 
-    std::cout << "\n>>> ALLE TESTS PASSED!!!!! 🚀 <<<\n";
+    std::cout << "\n>>> ALL TESTS PASSED <<<\n";
 
     return 0;
 }
