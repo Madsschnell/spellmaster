@@ -14,17 +14,6 @@
 
 using namespace std::chrono_literals;
 
-void print_usage(const char* argv0) {
-    std::cout << "Usage: " << argv0 << " [mode] [ip]\n"
-              << "Modes:\n"
-              << "  local       (default) Runs both GameMaster and Player locally.\n"
-              << "  gamemaster  Runs GameMaster simulation.\n"
-              << "  player      Runs Player simulation. Connects to [ip].\n"
-              << "Example:\n"
-              << "  " << argv0 << " gamemaster\n"
-              << "  " << argv0 << " player 192.168.8.100\n";
-}
-
 int main(int argc, char* argv[])
 {
     std::string mode = "local";
@@ -33,7 +22,7 @@ int main(int argc, char* argv[])
     if (argc >= 2) {
         mode = argv[1];
         if (mode == "--help" || mode == "-h") {
-            print_usage(argv[0]);
+            std::cout << "Usage: " << argv[0] << " [local|gamemaster|player] [ip]\n";
             return 0;
         }
     }
@@ -42,7 +31,7 @@ int main(int argc, char* argv[])
     }
 
     if (mode != "local" && mode != "gamemaster" && mode != "player") {
-        print_usage(argv[0]);
+        std::cerr << "Usage: " << argv[0] << " [local|gamemaster|player] [ip]\n";
         return 1;
     }
 
@@ -78,9 +67,7 @@ int main(int argc, char* argv[])
 
     std::this_thread::sleep_for(500ms); // Allow connections to establish
 
-    // --- Synchronization ---
-    // ZeroMQ PUB sockets will drop messages if subscribers aren't ready. 
-    // To fix this, Player sends a sync message and GameMaster waits for it.
+    // ZeroMQ PUB sockets will drop messages if subscribers aren't ready. Player sends a sync message and GameMaster waits for it.
     if (run_pl) {
         PlayerAction syncMsg{"player1", "sync"};
         zmq_push(*player_push, syncMsg);
@@ -120,7 +107,10 @@ int main(int argc, char* argv[])
         assert(topic == "player1");
         assert(gsIn.phase == GamePhase::CASTING);
         assert(gsIn.selfEffect.type == EffectType::HEAL);
+        
         std::cout << "[OK] Serialization: GameStatus round-trip successful.\n";
+        std::cout << "     Data integrity verified:\n";
+        std::cout << "     " << json_to_string(gsIn) << "\n";
 
         SpellMessage smOut{"player1", "Fireball"};
         zmq_push(*player_push, smOut);
@@ -138,7 +128,10 @@ int main(int argc, char* argv[])
         SpellMessage smIn;
         gmReceivedJson.get_to(smIn);
         assert(smIn.spellName == "Fireball");
+        
         std::cout << "[OK] Deserialization: SpellMessage round-trip successful.\n";
+        std::cout << "     Client -> GameMaster payload verified:\n";
+        std::cout << "     " << gmReceivedJson.dump() << "\n";
     }
 
     // --- Stress test ---
@@ -159,7 +152,7 @@ int main(int argc, char* argv[])
         json gmReceivedJson;
         
         for(int t=0; t<100 && receivedCount < NUM_MESSAGES; ++t) {
-            while (zmq_pull_raw(*gm_pull, gmReceivedJson)) {
+            while (receivedCount < NUM_MESSAGES && zmq_pull_raw(*gm_pull, gmReceivedJson)) {
                 gmReceivedJson.get_to(paIn);
                 // Verify messages arrive in the same order they were sent
                 assert(paIn.action == "ready_" + std::to_string(receivedCount));
@@ -171,7 +164,7 @@ int main(int argc, char* argv[])
         std::cout << "[OK] Stress test: 50 PlayerAction messages sent and received in order.\n";
     }
 
-    // --- Error handling (robustness against corrupt data) ---
+    // --- Error handling ---
     std::cout << "\n--- Error handling ---\n";
 
     if (run_pl) {
